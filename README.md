@@ -1,8 +1,24 @@
-[![Build Status](https://github.com/hprange/wounit/actions/workflows/deploy.yml/badge.svg)](https://github.com/hprange/wounit/actions/workflows/deploy.yml)
+[![Build Status](https://github.com/logicsquad/wounit/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/logicsquad/wounit/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 WOUnit
 ======
+
+> **This is the [Logic Squad](https://logicsquad.net) fork of WOUnit.**
+> WOUnit was created by Henrique Prange, who developed and maintained it
+> at [hprange/wounit](https://github.com/hprange/wounit) up to its 1.5
+> release in 2022. The original project no longer appears to be under
+> active development, so we're carrying it on here — with our thanks to
+> Henrique for more than a decade of work.
+>
+> WOUnit 2.0 is being rebuilt for [JUnit 6](https://junit.org/) and
+> Java 21, and will be published as `net.logicsquad:wounit`. It drops
+> support for JUnit 4, so projects that use JUnit 4 should stay on
+> WOUnit 1.5.
+>
+> 2.0 has not been released yet. Until it is, the rest of this README
+> describes WOUnit 1.5. Work on 2.0 is tracked in
+> [GitHub Issues](https://github.com/logicsquad/wounit/issues).
 
 The WOUnit framework contains a set of utilities for testing WebObjects
 applications using JUnit 4.7 or later capabilities. This library can be
@@ -108,23 +124,13 @@ WOUnit can be built running the Maven command:
 
 **Note**: WOUnit can only be successfully built if the WOCommunity repository is correctly configured.
 
-### Building with Ant
+Alternatively, use the `.maven_settings.xml` file in the project root, which configures the WOCommunity repository:
 
-WOUnit can be built running the Ant command:
-
-	ant package
-
-The required libraries will be automatically download to the `lib` folder in the WOUnit project root.
-
-**Note**: WebObjects must be installed. If it isn't installed in the default location, a parameter can be used to define the path to the WebObjects libraries.
-
-	ant package -Dwebobjects.lib=${path_to_webobjects_lib_folder}
+	mvn -s .maven_settings.xml clean install
 
 ### Importing into Eclipse
 
 Maven users should install the [m2e](http://eclipse.org/m2e/) plug-in for Eclipse and use the _Import Maven Project_ option.
-
-Ant users can add the libraries downloaded into the `lib` folder to the project's build path. The WebObjects libraries must be added manually.
 
 Acknowledge
 -----------

@@ -35,11 +35,4 @@
 <activeProfiles>
   <activeProfile>default</activeProfile>
 </activeProfiles>
-<servers>
-  <server>
-    <id>wocommunity.deployment</id>
-    <username>${env.CI_DEPLOY_USERNAME}</username>
-    <password>${env.CI_DEPLOY_PASSWORD}</password>
-  </server>
-</servers>
 </settings>
