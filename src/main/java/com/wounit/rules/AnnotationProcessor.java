@@ -80,7 +80,7 @@ class AnnotationProcessor {
     }
 
     private static WOUnitException unexpectedException(Exception exception) {
-        return new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
+        return new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to https://github.com/logicsquad/wounit/issues.", exception);
     }
 
     /**
