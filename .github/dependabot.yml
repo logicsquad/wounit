@@ -23,6 +23,12 @@ updates:
     target-branch: develop
     labels:
       - dependencies
+    ignore:
+      # WOUnit builds against SLF4J 1.7 on purpose, so that it only uses the
+      # API that SLF4J 1.7 and 2.x share
+      - dependency-name: "org.slf4j:*"
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: /
