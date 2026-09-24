@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
@@ -246,7 +247,7 @@ public abstract class AbstractEditingContextTest {
     @Test
     public void exceptionIfCannotFindModel() throws Exception {
 	thrown.expect(IllegalArgumentException.class);
-	thrown.expectMessage(is("Cannot load model named 'UnknownModel'"));
+	thrown.expectMessage(startsWith("Cannot load model named 'UnknownModel'."));
 
 	initEditingContext("UnknownModel");
     }

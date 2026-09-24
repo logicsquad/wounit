@@ -21,3 +21,8 @@ Changelog
 ----------------
 
 * WOUnit requires Java 21. ([#1](https://github.com/logicsquad/wounit/issues/1))
+* A missing EOModel fails with an `IllegalArgumentException` again on
+  Java 9 and later, instead of a `ClassCastException`. Its message now
+  suggests a similarly named model and lists the available models,
+  which WOUnit used to print to the console instead.
+  ([#5](https://github.com/logicsquad/wounit/issues/5))

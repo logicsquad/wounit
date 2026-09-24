@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.rules;
 
@@ -245,9 +246,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
         }
 
         if (url == null) {
-            WOUnitTroubleshooter.diagnoseModelNotFound(modelName);
-
-            throw new IllegalArgumentException(String.format("Cannot load model named '%s'", modelName));
+            throw new IllegalArgumentException(WOUnitTroubleshooter.diagnoseModelNotFound(modelName));
         }
 
         modelGroup.addModelWithPathURL(url);
