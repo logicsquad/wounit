@@ -254,7 +254,7 @@
 			<groupId>wonder.eof</groupId>
 			<artifactId>ERAttributeExtension</artifactId>
 			<version>${wonder.version}</version>
-			<optional>true</optional>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.webobjects</groupId>
