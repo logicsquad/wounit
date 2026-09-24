@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.rules;
 
 import java.lang.annotation.Annotation;
@@ -52,8 +53,8 @@ class AnnotationProcessor {
         EOEnterpriseObject object;
 
         try {
-            object = type.asSubclass(EOEnterpriseObject.class).newInstance();
-        } catch (InstantiationException | IllegalAccessException exception) {
+            object = type.asSubclass(EOEnterpriseObject.class).getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException exception) {
             throw unexpectedException(exception);
         }
 
