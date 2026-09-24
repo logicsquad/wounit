@@ -36,12 +36,12 @@ import com.wounit.rules.TemporaryEditingContext;
  *     &#064;Dummy
  *     private Bar bar;
  * 
- *     &#064;Rule
+ *     &#064;RegisterExtension
  *     public MockEditingContext ec = new MockEditingContext(&quot;SampleModel&quot;);
  * 
  *     private Foo foo;
  * 
- *     &#064;Before
+ *     &#064;BeforeEach
  *     public void setup() {
  * 	foo = Foo.createFoo(ec);
  * 

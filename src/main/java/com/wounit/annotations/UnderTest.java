@@ -37,7 +37,7 @@ import com.wounit.rules.TemporaryEditingContext;
  *     &#064;UnderTest
  *     private Foo foo;
  * 
- *     &#064;Rule
+ *     &#064;RegisterExtension
  *     public MockEditingContext ec = new MockEditingContext(&quot;SampleModel&quot;);
  * 
  *     &#064;Test
@@ -47,7 +47,7 @@ import com.wounit.rules.TemporaryEditingContext;
  * }
  * </pre>
  * 
- * The <code>@UnderTest</code> annotation works with both rules:
+ * The <code>@UnderTest</code> annotation works with both extensions:
  * {@link MockEditingContext} and {@link TemporaryEditingContext}.
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>

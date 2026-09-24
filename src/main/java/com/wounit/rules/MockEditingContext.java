@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.rules;
 
@@ -57,7 +58,7 @@ import er.extensions.eof.ERXS;
  * 
  * <pre>
  * public class TestMyModel {
- *     &#064;Rule
+ *     &#064;RegisterExtension
  *     public MockEditingContext editingContext = new MockEditingContext(&quot;MyModel&quot;);
  * 
  *     &#064;Test

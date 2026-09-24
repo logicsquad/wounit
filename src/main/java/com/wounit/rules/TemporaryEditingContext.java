@@ -50,7 +50,7 @@ import er.memoryadaptor.ERMemoryAdaptorContext;
  * 
  * <pre>
  * public class TestMyModel {
- *     &#064;Rule
+ *     &#064;RegisterExtension
  *     public TemporaryEditingContext editingContext = new TemporaryEditingContext(&quot;MyModel&quot;);
  * 
  *     &#064;Test

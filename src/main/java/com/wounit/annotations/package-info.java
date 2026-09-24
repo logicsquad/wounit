@@ -13,11 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 /**
  * This package contains annotations to be used in companion of the
  * {@link com.wounit.rules.MockEditingContext} or the
- * {@link com.wounit.rules.TemporaryEditingContext} rules. They assist in
+ * {@link com.wounit.rules.TemporaryEditingContext} extensions. They assist in
  * writing more readable and less verbose unit tests.
  * 
  * @since 1.1
