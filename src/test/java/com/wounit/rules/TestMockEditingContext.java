@@ -23,8 +23,10 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -32,11 +34,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.webobjects.eoaccess.EOModelGroup;
 import com.webobjects.eocontrol.EOEditingContext;
@@ -63,7 +65,7 @@ import er.extensions.eof.ERXS;
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TestMockEditingContext extends AbstractEditingContextTest {
     @Mock
     private EOFetchSpecification mockFetchSpecification;
@@ -171,40 +173,36 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
     public void cannotCreateMockInstanceForClassThatCannotBeRecognized() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	thrown.expect(IllegalArgumentException.class);
-	thrown.expectMessage(is("Cannot create an instance based on the provided class. Please, provide an entity name instead."));
+	IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> editingContext.createSavedObject(StubEntity.class));
 
-	editingContext.createSavedObject(StubEntity.class);
+	assertThat(exception.getMessage(), is("Cannot create an instance based on the provided class. Please, provide an entity name instead."));
     }
 
     @Test
     public void cannotCreateMockInstanceForInvalidEntityName() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	thrown.expect(IllegalArgumentException.class);
-	thrown.expectMessage(is("Could not find EOClassDescription for entity name 'InvalidEntityName'."));
+	IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> editingContext.createSavedObject("InvalidEntityName"));
 
-	editingContext.createSavedObject("InvalidEntityName");
+	assertThat(exception.getMessage(), is("Could not find EOClassDescription for entity name 'InvalidEntityName'."));
     }
 
     @Test
     public void cannotCreateMockInstanceForNullClass() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	thrown.expect(IllegalArgumentException.class);
-	thrown.expectMessage(is("Cannot create an instance for a null class."));
+	IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> editingContext.createSavedObject((Class<EOEnterpriseObject>) null));
 
-	editingContext.createSavedObject((Class<EOEnterpriseObject>) null);
+	assertThat(exception.getMessage(), is("Cannot create an instance for a null class."));
     }
 
     @Test
     public void cannotCreateMockInstanceForNullEntityName() throws Exception {
 	MockEditingContext editingContext = new MockEditingContext(TEST_MODEL_NAME);
 
-	thrown.expect(IllegalArgumentException.class);
-	thrown.expectMessage(is("Cannot create an instance for a null entity name."));
+	IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> editingContext.createSavedObject((String) null));
 
-	editingContext.createSavedObject((String) null);
+	assertThat(exception.getMessage(), is("Cannot create an instance for a null entity name."));
     }
 
     @Test
@@ -652,8 +650,8 @@ public class TestMockEditingContext extends AbstractEditingContextTest {
 	editingContext.after();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
-	when(mockFetchSpecification.entityName()).thenReturn(FooEntity.ENTITY_NAME);
+	lenient().when(mockFetchSpecification.entityName()).thenReturn(FooEntity.ENTITY_NAME);
     }
 }

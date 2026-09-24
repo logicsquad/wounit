@@ -20,18 +20,19 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.wounit.annotations.Dummy;
 import com.wounit.exceptions.WOUnitException;
@@ -49,7 +50,7 @@ import com.wounit.stubs.WrongTypeForSpiedObjectStubTestCase;
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TestAnnotationProcessor {
     @Mock
     private EditingContextFacade mockFacade;
@@ -57,10 +58,7 @@ public class TestAnnotationProcessor {
     @Mock
     private FooEntity mockFoo;
 
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
-
-    @Rule
+    @RegisterExtension
     public final MockEditingContext editingContext = new MockEditingContext("Test");
 
     @Test
@@ -151,10 +149,9 @@ public class TestAnnotationProcessor {
 
         AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-        thrown.expect(WOUnitException.class);
-        thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+        WOUnitException exception = assertThrows(WOUnitException.class, () -> processor.process(Dummy.class, mockFacade));
 
-        processor.process(Dummy.class, mockFacade);
+        assertThat(exception.getMessage(), is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
     }
 
     @Test
@@ -163,10 +160,9 @@ public class TestAnnotationProcessor {
 
         AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-        thrown.expect(WOUnitException.class);
-        thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+        WOUnitException exception = assertThrows(WOUnitException.class, () -> processor.process(Dummy.class, mockFacade));
 
-        processor.process(Dummy.class, mockFacade);
+        assertThat(exception.getMessage(), is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
     }
 
     @Test
@@ -175,10 +171,9 @@ public class TestAnnotationProcessor {
 
         AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-        thrown.expect(WOUnitException.class);
-        thrown.expectMessage(is("Cannot create object for a raw type com.webobjects.foundation.NSArray. Please, provide a generic type."));
+        WOUnitException exception = assertThrows(WOUnitException.class, () -> processor.process(Dummy.class, mockFacade));
 
-        processor.process(Dummy.class, mockFacade);
+        assertThat(exception.getMessage(), is("Cannot create object for a raw type com.webobjects.foundation.NSArray. Please, provide a generic type."));
     }
 
     @Test
@@ -187,10 +182,9 @@ public class TestAnnotationProcessor {
 
         AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-        thrown.expect(WOUnitException.class);
-        thrown.expectMessage(is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
+        WOUnitException exception = assertThrows(WOUnitException.class, () -> processor.process(Dummy.class, mockFacade));
 
-        processor.process(Dummy.class, mockFacade);
+        assertThat(exception.getMessage(), is("Cannot create object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Dummy."));
     }
 
     @Test
@@ -199,15 +193,14 @@ public class TestAnnotationProcessor {
 
         AnnotationProcessor processor = new AnnotationProcessor(mockTarget);
 
-        thrown.expect(WOUnitException.class);
-        thrown.expectMessage(is("Cannot spy object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Spy + @Dummy."));
+        WOUnitException exception = assertThrows(WOUnitException.class, () -> processor.process(Dummy.class, mockFacade));
 
-        processor.process(Dummy.class, mockFacade);
+        assertThat(exception.getMessage(), is("Cannot spy object of type java.lang.String.\n Only fields and arrays of type com.webobjects.eocontrol.EOEnterpriseObject can be annotated with @Spy + @Dummy."));
     }
 
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
     public void setup() {
-        when(mockFacade.create(Mockito.any(Class.class))).thenReturn(mockFoo);
+        lenient().when(mockFacade.create(Mockito.any(Class.class))).thenReturn(mockFoo);
     }
 }

@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.matchers;
 
@@ -31,11 +32,11 @@ import static com.wounit.matchers.EOAssert.hasNotBeenDeleted;
 import static com.wounit.matchers.EOAssert.hasNotBeenSaved;
 import static com.wounit.matchers.EOAssert.saveChanges;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.wounit.annotations.UnderTest;
 import com.wounit.model.FooEntity;
@@ -45,23 +46,19 @@ import com.wounit.rules.AbstractEditingContextRule;
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
 public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule> {
-    @Rule
+    @RegisterExtension
     public final T editingContext = createEditingContext("Test");
 
     @UnderTest
     private FooEntity foo;
 
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
-
     @Test
     public void canBeDeletedFailure() throws Exception {
 	foo.setCanBeDeleted(false);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: valid for delete enterprise object\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be deleted\""));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, canBeDeleted()));
 
-	confirm(foo, canBeDeleted());
+	assertThat(error.getMessage(), is("\nExpected: valid for delete enterprise object\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be deleted\""));
     }
 
     @Test
@@ -75,10 +72,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void canBeSavedFailure() throws Exception {
 	foo.setCanBeSaved(false);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: valid for save enterprise object\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be saved\""));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, canBeSaved()));
 
-	confirm(foo, canBeSaved());
+	assertThat(error.getMessage(), is("\nExpected: valid for save enterprise object\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be saved\""));
     }
 
     @Test
@@ -92,10 +88,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void cannotBeDeletedFailure() throws Exception {
 	foo.setCanBeDeleted(true);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not valid for delete enterprise object\n     but got: a valid one"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, cannotBeDeleted()));
 
-	confirm(foo, cannotBeDeleted());
+	assertThat(error.getMessage(), is("\nExpected: not valid for delete enterprise object\n     but got: a valid one"));
     }
 
     @Test
@@ -109,10 +104,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void cannotBeDeletedWithMessageFailure() throws Exception {
 	foo.setCanBeDeleted(true);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not expecting exception other than \"This foo object can't be deleted\"\n     but got: no validation exception"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, cannotBeDeletedBecause("This foo object can't be deleted")));
 
-	confirm(foo, cannotBeDeletedBecause("This foo object can't be deleted"));
+	assertThat(error.getMessage(), is("\nExpected: not expecting exception other than \"This foo object can't be deleted\"\n     but got: no validation exception"));
     }
 
     @Test
@@ -126,20 +120,18 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void cannotBeDeletedWithWrongCauseFailure() throws Exception {
 	foo.setCanBeDeleted(false);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not expecting exception other than \"The wrong exception\"\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be deleted\""));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, cannotBeDeletedBecause("The wrong exception")));
 
-	confirm(foo, cannotBeDeletedBecause("The wrong exception"));
+	assertThat(error.getMessage(), is("\nExpected: not expecting exception other than \"The wrong exception\"\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be deleted\""));
     }
 
     @Test
     public void cannotBeSavedFailure() throws Exception {
 	foo.setCanBeSaved(true);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not valid for save enterprise object\n     but got: a valid one"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, cannotBeSaved()));
 
-	confirm(foo, cannotBeSaved());
+	assertThat(error.getMessage(), is("\nExpected: not valid for save enterprise object\n     but got: a valid one"));
     }
 
     @Test
@@ -153,10 +145,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void cannotBeSavedWithMessageFailure() throws Exception {
 	foo.setCanBeSaved(true);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not expecting exception other than \"This foo object can't be saved\"\n     but got: no validation exception"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, cannotBeSavedBecause("This foo object can't be saved")));
 
-	confirm(foo, cannotBeSavedBecause("This foo object can't be saved"));
+	assertThat(error.getMessage(), is("\nExpected: not expecting exception other than \"This foo object can't be saved\"\n     but got: no validation exception"));
     }
 
     @Test
@@ -170,10 +161,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void cannotBeSavedWithWrongCauseFailure() throws Exception {
 	foo.setCanBeSaved(false);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not expecting exception other than \"The wrong exception\"\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be saved\""));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, cannotBeSavedBecause("The wrong exception")));
 
-	confirm(foo, cannotBeSavedBecause("The wrong exception"));
+	assertThat(error.getMessage(), is("\nExpected: not expecting exception other than \"The wrong exception\"\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be saved\""));
     }
 
     protected abstract T createEditingContext(String... modelNames);
@@ -182,10 +172,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void doNotSaveChangesFailure() throws Exception {
 	foo.setCanBeSaved(true);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not successfully saved editing context\n     but got: a successfully saved editing context"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(editingContext, doNotSaveChanges()));
 
-	confirm(editingContext, doNotSaveChanges());
+	assertThat(error.getMessage(), is("\nExpected: not successfully saved editing context\n     but got: a successfully saved editing context"));
     }
 
     @Test
@@ -199,10 +188,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void doNotSaveChangesWithMessageFailure() throws Exception {
 	foo.setCanBeSaved(true);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not expecting exception other than \"This foo object can't be saved\" while saving the editing context\n     but got: no exception and the editing context was successfully saved"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(editingContext, doNotSaveChangesBecause("This foo object can't be saved")));
 
-	confirm(editingContext, doNotSaveChangesBecause("This foo object can't be saved"));
+	assertThat(error.getMessage(), is("\nExpected: not expecting exception other than \"This foo object can't be saved\" while saving the editing context\n     but got: no exception and the editing context was successfully saved"));
     }
 
     @Test
@@ -216,18 +204,16 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void doNotSaveWithWrongCauseFailure() throws Exception {
 	foo.setCanBeSaved(false);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not expecting exception other than \"The wrong exception\" while saving the editing context\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be saved\""));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(editingContext, doNotSaveChangesBecause("The wrong exception")));
 
-	confirm(editingContext, doNotSaveChangesBecause("The wrong exception"));
+	assertThat(error.getMessage(), is("\nExpected: not expecting exception other than \"The wrong exception\" while saving the editing context\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be saved\""));
     }
 
     @Test
     public void hasBeenDeletedFailure() throws Exception {
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: deleted object\n     but got: an active object"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, hasBeenDeleted()));
 
-	confirm(foo, hasBeenDeleted());
+	assertThat(error.getMessage(), is("\nExpected: deleted object\n     but got: an active object"));
     }
 
     @Test
@@ -247,10 +233,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
 
     @Test
     public void hasBeenSavedFailure() throws Exception {
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: saved object\n     but got: an object with unsaved changes"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, hasBeenSaved()));
 
-	confirm(foo, hasBeenSaved());
+	assertThat(error.getMessage(), is("\nExpected: saved object\n     but got: an object with unsaved changes"));
     }
 
     @Test
@@ -264,10 +249,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void hasNotBeenDeletedFailure() throws Exception {
 	editingContext.deleteObject(foo);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not deleted object\n     but got: a deleted object"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, hasNotBeenDeleted()));
 
-	confirm(foo, hasNotBeenDeleted());
+	assertThat(error.getMessage(), is("\nExpected: not deleted object\n     but got: a deleted object"));
     }
 
     @Test
@@ -279,10 +263,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void hasNotBeenSavedFailure() throws Exception {
 	editingContext.saveChanges();
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: not saved object\n     but got: an object with saved changes"));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(foo, hasNotBeenSaved()));
 
-	confirm(foo, hasNotBeenSaved());
+	assertThat(error.getMessage(), is("\nExpected: not saved object\n     but got: an object with saved changes"));
     }
 
     @Test
@@ -303,10 +286,9 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
     public void saveChagesFailure() throws Exception {
 	foo.setCanBeSaved(false);
 
-	thrown.expect(AssertionError.class);
-	thrown.expectMessage(is("\nExpected: successfully saved editing context\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be saved\""));
+	AssertionError error = assertThrows(AssertionError.class, () -> confirm(editingContext, saveChanges()));
 
-	confirm(editingContext, saveChanges());
+	assertThat(error.getMessage(), is("\nExpected: successfully saved editing context\n     but got: com.webobjects.foundation.NSValidation$ValidationException: \"This foo object can't be saved\""));
     }
 
     @Test
@@ -314,10 +296,5 @@ public abstract class AbstractEOAssertTest<T extends AbstractEditingContextRule>
 	foo.setCanBeSaved(true);
 
 	confirm(editingContext, saveChanges());
-    }
-
-    @Before
-    public void setup() {
-	thrown.handleAssertionErrors();
     }
 }

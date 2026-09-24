@@ -13,15 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.rules;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.math.BigDecimal;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.webobjects.foundation.NSArray;
 import com.wounit.annotations.Dummy;
@@ -31,7 +32,7 @@ import com.wounit.model.ExtendedPrototypeEntity;
  * @author <a href="mailto:hprange@gmail.com.br">Henrique Prange</a>
  */
 public class TestNSArrayOperators {
-    @Rule
+    @RegisterExtension
     public MockEditingContext editingContext = new MockEditingContext("Test");
 
     @Dummy(size = 2)

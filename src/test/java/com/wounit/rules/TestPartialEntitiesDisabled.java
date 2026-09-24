@@ -13,16 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.rules;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.wounit.annotations.UnderTest;
 import com.wounit.model.AugmentedEntity;
@@ -34,12 +35,12 @@ import er.extensions.foundation.ERXProperties;
  * @author <a href="mailto:hprange@gmail.com.br">Henrique Prange</a>
  */
 public class TestPartialEntitiesDisabled {
-    @BeforeClass
+    @BeforeAll
     public static void disablePartials() {
         ERXProperties.setStringForKey("false", "er.extensions.partials.enabled");
     }
 
-    @AfterClass
+    @AfterAll
     public static void removePartialsConfiguration() {
         ERXProperties.removeKey("er.extensions.partials.enabled");
     }
@@ -47,7 +48,7 @@ public class TestPartialEntitiesDisabled {
     @UnderTest
     protected BaseEntity base;
 
-    @Rule
+    @RegisterExtension
     public MockEditingContext editingContext = new MockEditingContext("PartialsTest");
 
     @Test

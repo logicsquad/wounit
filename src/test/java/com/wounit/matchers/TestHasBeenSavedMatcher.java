@@ -17,20 +17,20 @@
 
 package com.wounit.matchers;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.hamcrest.Description;
 import org.hamcrest.StringDescription;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
@@ -41,7 +41,7 @@ import com.webobjects.foundation.NSMutableDictionary;
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TestHasBeenSavedMatcher {
     private HasBeenSavedMatcher<EOEnterpriseObject> matcher;
 
@@ -55,9 +55,6 @@ public class TestHasBeenSavedMatcher {
 
     @Mock
     private EOEnterpriseObject mockObject;
-
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void descriptionForHasBeenSaved() throws Exception {
@@ -85,10 +82,9 @@ public class TestHasBeenSavedMatcher {
     public void exceptionIfEditingContextIsNull() throws Exception {
 	Mockito.when(mockObject.editingContext()).thenReturn(null);
 
-	thrown.expect(IllegalArgumentException.class);
-	thrown.expectMessage("The enterprise object has no editing context reference. Are you sure the enterprise object was inserted into an editing context?");
+	IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> matcher.matchesSafely(mockObject));
 
-	matcher.matchesSafely(mockObject);
+	assertThat(exception.getMessage(), containsString("The enterprise object has no editing context reference. Are you sure the enterprise object was inserted into an editing context?"));
     }
 
     @Test
@@ -139,13 +135,13 @@ public class TestHasBeenSavedMatcher {
 	assertThat(result, is(false));
     }
 
-    @Before
+    @BeforeEach
     @SuppressWarnings("unchecked")
     public void setup() {
 	matcher = new HasBeenSavedMatcher<EOEnterpriseObject>();
 
 	mockDescription = new StringDescription();
 
-	Mockito.when(mockObject.changesFromSnapshot(ArgumentMatchers.nullable(NSDictionary.class))).thenReturn(NSDictionary.emptyDictionary());
+	Mockito.lenient().when(mockObject.changesFromSnapshot(ArgumentMatchers.nullable(NSDictionary.class))).thenReturn(NSDictionary.emptyDictionary());
     }
 }

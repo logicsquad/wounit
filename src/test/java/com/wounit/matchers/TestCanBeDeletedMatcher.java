@@ -18,19 +18,19 @@
 package com.wounit.matchers;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hamcrest.StringDescription;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
@@ -41,7 +41,7 @@ import er.extensions.eof.ERXEnterpriseObject;
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TestCanBeDeletedMatcher {
     @Mock
     private EOEnterpriseObject mockObject;
@@ -155,7 +155,7 @@ public class TestCanBeDeletedMatcher {
 	inOrder.verify(mockObject).validateForDelete();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
 	matcher = new CanBeDeletedMatcher<EOEnterpriseObject>();
 
