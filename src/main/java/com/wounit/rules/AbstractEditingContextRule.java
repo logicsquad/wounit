@@ -24,9 +24,6 @@ import java.util.Collection;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
 
 import com.webobjects.eoaccess.EOEntity;
 import com.webobjects.eoaccess.EOModel;
@@ -48,15 +45,15 @@ import er.extensions.partials.ERXPartialInitializer;
 
 /**
  * <code>AbstractEditingContextRule</code> is a subclass of <code>ERXEC</code>
- * that implements the {@link MethodRule} interface, and JUnit Jupiter's
- * {@link BeforeEachCallback} and {@link AfterEachCallback} interfaces. This
- * class provides the required infrastructure to properly initialize/dispose
- * the <code>ERXEC</code> before/after the test execution.
+ * that implements JUnit Jupiter's {@link BeforeEachCallback} and
+ * {@link AfterEachCallback} interfaces. This class provides the required
+ * infrastructure to properly initialize/dispose the <code>ERXEC</code>
+ * before/after the test execution.
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
-public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule, BeforeEachCallback, AfterEachCallback {
+public abstract class AbstractEditingContextRule extends ERXEC implements BeforeEachCallback, AfterEachCallback {
     // Lazy initialization of singleton instance of ERXExtensions
     private static class SINGLETONS {
         static ERXExtensions exrExtensions = new ERXExtensions();
@@ -185,30 +182,6 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
      */
     protected void disposeImpl() {
         super.dispose();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.junit.rules.MethodRule#apply(org.junit.runners.model.Statement,
-     * org.junit.runners.model.FrameworkMethod, java.lang.Object)
-     */
-    @Override
-    public final Statement apply(final Statement base, FrameworkMethod method, final Object target) {
-        processor = new AnnotationProcessor(target);
-
-        return new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                before();
-
-                try {
-                    base.evaluate();
-                } finally {
-                    after();
-                }
-            }
-        };
     }
 
     /**

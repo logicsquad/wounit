@@ -27,19 +27,17 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.net.URL;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runners.model.Statement;
-import org.mockito.InOrder;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -67,10 +65,7 @@ public abstract class AbstractEditingContextTest {
     private AnnotationProcessor mockProcessor;
 
     @Mock
-    protected Statement mockStatement;
-
-    @Mock
-    protected Object mockTarget;
+    protected ExtensionContext mockExtensionContext;
 
     @Test
     public void alwaysConfigureWOUnitBundleFactory() throws Exception {
@@ -199,45 +194,43 @@ public abstract class AbstractEditingContextTest {
     }
 
     @Test
-    public void ensureEditingContextCleanUpIsTriggeredAfterTestExecution() throws Throwable {
+    public void ensureEditingContextCleanUpIsTriggeredAfterEachTest() throws Exception {
 	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
 
-	InOrder inOrder = inOrder(editingContext, mockStatement);
+	when(mockExtensionContext.getRequiredTestInstance()).thenReturn(new StubTestCase());
 
-	editingContext.apply(mockStatement, null, mockTarget).evaluate();
+	editingContext.beforeEach(mockExtensionContext);
+	editingContext.afterEach(mockExtensionContext);
 
-	inOrder.verify(mockStatement).evaluate();
-	inOrder.verify(editingContext).after();
+	verify(editingContext).after();
     }
 
     @Test
-    public void ensureEditingContextCleanUpIsTriggeredEvenIfTestExecutionThrowsException() throws Throwable {
+    public void ensureEditingContextInitializationIsTriggeredBeforeEachTest() throws Exception {
 	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
 
-	doThrow(new Throwable("test error")).when(mockStatement).evaluate();
+	when(mockExtensionContext.getRequiredTestInstance()).thenReturn(new StubTestCase());
 
-	InOrder inOrder = inOrder(editingContext, mockStatement);
+	editingContext.beforeEach(mockExtensionContext);
 
-	try {
-	    editingContext.apply(mockStatement, null, mockTarget).evaluate();
-	} catch (Throwable exception) {
-	    // DO NOTHING
-	} finally {
-	    inOrder.verify(mockStatement).evaluate();
-	    inOrder.verify(editingContext).after();
-	}
+	verify(editingContext).before();
+
+	editingContext.afterEach(mockExtensionContext);
     }
 
     @Test
-    public void ensureEditingContextInitializationIsTriggeredBeforeTestExecution() throws Throwable {
-	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
+    public void ensureTestInstanceIsProcessedBeforeEachTest() throws Exception {
+	AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
 
-	InOrder inOrder = inOrder(editingContext, mockStatement);
+	StubTestCase testCase = new StubTestCase();
 
-	editingContext.apply(mockStatement, null, mockTarget).evaluate();
+	when(mockExtensionContext.getRequiredTestInstance()).thenReturn(testCase);
 
-	inOrder.verify(editingContext).before();
-	inOrder.verify(mockStatement).evaluate();
+	editingContext.beforeEach(mockExtensionContext);
+
+	assertThat(testCase.objectUnderTest(), notNullValue());
+
+	editingContext.afterEach(mockExtensionContext);
     }
 
     @Test

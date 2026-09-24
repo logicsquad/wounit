@@ -29,5 +29,6 @@ Changelog
 * WOUnit depends on `org.hamcrest:hamcrest` 3.0 instead of
   `hamcrest-core` 1.3. ([#2](https://github.com/logicsquad/wounit/issues/2))
 * `MockEditingContext` and `TemporaryEditingContext` are JUnit Jupiter
-  extensions: register them with `@RegisterExtension`.
+  extensions: register them with `@RegisterExtension` instead of `@Rule`.
+  JUnit 4 is no longer supported.
   ([#3](https://github.com/logicsquad/wounit/issues/3))

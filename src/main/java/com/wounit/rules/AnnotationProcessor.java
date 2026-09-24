@@ -169,9 +169,9 @@ class AnnotationProcessor {
             }
 
             if (object == null) {
-                // Depending on the Mockito version, the MockitoJUnitRunner evaluation may not run before evaluating the
-                // WOUnit rule. As a result, the field may be null at this point. We must create and spy the object by
-                // ourselves in this case.
+                // Mockito may not have initialised the field, for example when the test doesn't use MockitoExtension.
+                // As a result, the field may be null at this point. We must create and spy the object by ourselves in
+                // this case.
                 object = createSpiedEOForType(type);
             }
 
