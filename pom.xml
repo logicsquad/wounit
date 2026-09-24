@@ -59,7 +59,7 @@
   </scm>
 
 	<properties>
-		<wonder.version>7.1</wonder.version>
+		<wonder.version>7.4</wonder.version>
 		<webobjects.version>5.4.3</webobjects.version>
 		<junit.version>6.1.3</junit.version>
 		<mockito.version>5.24.0</mockito.version>
