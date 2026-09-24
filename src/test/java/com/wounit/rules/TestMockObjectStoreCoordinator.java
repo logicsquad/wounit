@@ -13,13 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.rules;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.webobjects.eocontrol.EOEditingContext;
 
@@ -35,6 +36,6 @@ public class TestMockObjectStoreCoordinator {
 
 	store.saveChangesInEditingContext(mockEditingContext);
 
-	verifyZeroInteractions(mockEditingContext);
+	verifyNoInteractions(mockEditingContext);
     }
 }

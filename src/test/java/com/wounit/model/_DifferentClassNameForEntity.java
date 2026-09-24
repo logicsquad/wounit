@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 // $LastChangedRevision: 5773 $ DO NOT EDIT.  Make changes to DifferentClassNameForEntity.java instead.
 package com.wounit.model;
@@ -22,7 +23,8 @@ import com.webobjects.eocontrol.*;
 import com.webobjects.foundation.*;
 import java.math.*;
 import java.util.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("all")
 public abstract class _DifferentClassNameForEntity extends er.extensions.eof.ERXGenericRecord {
@@ -32,7 +34,7 @@ public abstract class _DifferentClassNameForEntity extends er.extensions.eof.ERX
 
 	// Relationships
 
-  private static Logger LOG = Logger.getLogger(_DifferentClassNameForEntity.class);
+  private static Logger LOG = LoggerFactory.getLogger(_DifferentClassNameForEntity.class);
 
   public DifferentClassNameForEntity localInstanceIn(EOEditingContext editingContext) {
     DifferentClassNameForEntity localInstance = (DifferentClassNameForEntity)EOUtilities.localInstanceOfObject(editingContext, this);

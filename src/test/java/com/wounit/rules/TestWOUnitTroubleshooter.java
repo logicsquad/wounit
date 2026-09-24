@@ -13,50 +13,46 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.rules;
 
 import static com.wounit.rules.WOUnitTroubleshooter.Utils.extractModelName;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.PrintStream;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
 
 import com.wounit.rules.WOUnitTroubleshooter;
 
 /**
  * @author <a href="mailto:hprange@gmail.com.br">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
 public class TestWOUnitTroubleshooter {
-    @Mock
-    private PrintStream output;
-    private PrintStream systemOutput;
+    @Test
+    public void diagnoseEveryTime() throws Exception {
+	WOUnitTroubleshooter.diagnoseModelNotFound("xxx");
+
+	String result = WOUnitTroubleshooter.diagnoseModelNotFound("xxx");
+
+	assertThat(result, containsString(" Available models:"));
+    }
 
     @Test
     public void doNotSuggestModelNameWhenNoGoodMatchFound() throws Exception {
-	WOUnitTroubleshooter.diagnoseModelNotFound("AAAABBBBBCCCCCDDDDDEEEE");
+	String result = WOUnitTroubleshooter.diagnoseModelNotFound("AAAABBBBBCCCCCDDDDDEEEE");
 
-	verify(output, never()).print(Mockito.contains("Did you mean"));
+	assertThat(result, not(containsString("Did you mean")));
     }
 
     @Test
     public void doNotSuggestWhenModelNameIsNull() throws Exception {
-	WOUnitTroubleshooter.diagnoseModelNotFound(null);
+	String result = WOUnitTroubleshooter.diagnoseModelNotFound(null);
 
-	verify(output, never()).print(" Did you mean 'null'?");
+	assertThat(result, not(containsString("Did you mean")));
     }
 
     @Test
@@ -81,60 +77,33 @@ public class TestWOUnitTroubleshooter {
     }
 
     @Test
-    public void printAvailableModelNames() throws Exception {
-	WOUnitTroubleshooter.diagnoseModelNotFound("xxx");
+    public void listAvailableModelNames() throws Exception {
+	String result = WOUnitTroubleshooter.diagnoseModelNotFound("xxx");
 
-	verify(output).println(" Available models:");
-	verify(output).println("  - AnotherTest");
-	verify(output).println("  - Test");
-	verify(output).println("  - erprototypes");
+	assertThat(result, containsString(" Available models:"));
+	assertThat(result, containsString("\n  - AnotherTest"));
+	assertThat(result, containsString("\n  - Test"));
+	assertThat(result, containsString("\n  - erprototypes"));
     }
 
     @Test
-    public void printDiagnosesOnlyOnce() throws Exception {
-	WOUnitTroubleshooter.diagnoseModelNotFound("xxx");
+    public void modelNotFoundMessage() throws Exception {
+	String result = WOUnitTroubleshooter.diagnoseModelNotFound("xxx");
 
-	verify(output).print("A model named 'xxx' could not be found.");
-
-	reset(output);
-
-	WOUnitTroubleshooter.diagnoseModelNotFound("xxx");
-
-	verifyNoMoreInteractions(output);
-    }
-
-    @Test
-    public void printModelNotFoundMessage() throws Exception {
-	WOUnitTroubleshooter.diagnoseModelNotFound("xxx");
-
-	verify(output).print("A model named 'xxx' could not be found.");
-    }
-
-    @Before
-    public void setup() {
-	systemOutput = System.out;
-
-	System.setOut(output);
-
-	WOUnitTroubleshooter.ALREADY_DIAGNOSED.set(false);
+	assertThat(result, startsWith("Cannot load model named 'xxx'."));
     }
 
     @Test
     public void suggestModelNameIgnoresCaseWhenFindingBestMatch() throws Exception {
-	WOUnitTroubleshooter.diagnoseModelNotFound("ERPROTOTYPES");
+	String result = WOUnitTroubleshooter.diagnoseModelNotFound("ERPROTOTYPES");
 
-	verify(output).print(" Did you mean 'erprototypes'?");
+	assertThat(result, containsString(" Did you mean 'erprototypes'?"));
     }
 
     @Test
     public void suggestModelNameWhenPossible() throws Exception {
-	WOUnitTroubleshooter.diagnoseModelNotFound("Teste");
+	String result = WOUnitTroubleshooter.diagnoseModelNotFound("Teste");
 
-	verify(output).print(" Did you mean 'Test'?");
-    }
-
-    @After
-    public void tearDown() {
-	System.setOut(systemOutput);
+	assertThat(result, containsString(" Did you mean 'Test'?"));
     }
 }

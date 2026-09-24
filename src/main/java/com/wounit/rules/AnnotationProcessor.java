@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.rules;
 
 import java.lang.annotation.Annotation;
@@ -25,6 +26,8 @@ import java.util.List;
 
 import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.foundation.NSArray;
@@ -40,6 +43,8 @@ import com.wounit.exceptions.WOUnitException;
  * @since 1.1
  */
 class AnnotationProcessor {
+    private static final Logger LOG = LoggerFactory.getLogger(AnnotationProcessor.class);
+
     private static EOEnterpriseObject createEOForType(Class<?> type, Class<? extends Annotation> annotation, EditingContextFacade facade) {
         if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
             throw new WOUnitException("Cannot create object of type " + type.getName() + ".\n Only fields and arrays of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + annotation.getSimpleName() + ".");
@@ -52,8 +57,8 @@ class AnnotationProcessor {
         EOEnterpriseObject object;
 
         try {
-            object = type.asSubclass(EOEnterpriseObject.class).newInstance();
-        } catch (InstantiationException | IllegalAccessException exception) {
+            object = type.asSubclass(EOEnterpriseObject.class).getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException exception) {
             throw unexpectedException(exception);
         }
 
@@ -79,7 +84,7 @@ class AnnotationProcessor {
     }
 
     private static WOUnitException unexpectedException(Exception exception) {
-        return new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to http://github.com/hprange/wounit/issues.", exception);
+        return new WOUnitException("Something really wrong happened here. Probably a bug.\nPlease, report to https://github.com/logicsquad/wounit/issues.", exception);
     }
 
     /**
@@ -149,7 +154,7 @@ class AnnotationProcessor {
         }
 
         if (size != 1) {
-            System.out.println("[WARN] The field " + field.getName() + " isn't of NSArray type, but it is annotated with the size property.");
+            LOG.warn("The field {} isn't of NSArray type, but it is annotated with the size property.", field.getName());
         }
 
         if (isMockitoPresent && field.isAnnotationPresent(Spy.class)) {
@@ -168,9 +173,9 @@ class AnnotationProcessor {
             }
 
             if (object == null) {
-                // Depending on the Mockito version, the MockitoJUnitRunner evaluation may not run before evaluating the
-                // WOUnit rule. As a result, the field may be null at this point. We must create and spy the object by
-                // ourselves in this case.
+                // Mockito may not have initialised the field, for example when the test doesn't use MockitoExtension.
+                // As a result, the field may be null at this point. We must create and spy the object by ourselves in
+                // this case.
                 object = createSpiedEOForType(type);
             }
 

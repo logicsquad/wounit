@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.rules;
 
@@ -22,26 +23,24 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.net.URL;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.model.Statement;
-import org.mockito.InOrder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.webobjects.eoaccess.EOAttribute;
 import com.webobjects.eoaccess.EOEntity;
@@ -58,7 +57,7 @@ import er.extensions.eof.ERXEC;
 import er.extensions.eof.ERXEOAccessUtilities;
 import er.extensions.foundation.ERXProperties;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public abstract class AbstractEditingContextTest {
     protected static final String TEST_MODEL_NAME = "Test";
 
@@ -66,13 +65,7 @@ public abstract class AbstractEditingContextTest {
     private AnnotationProcessor mockProcessor;
 
     @Mock
-    protected Statement mockStatement;
-
-    @Mock
-    protected Object mockTarget;
-
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
+    protected ExtensionContext mockExtensionContext;
 
     @Test
     public void alwaysConfigureWOUnitBundleFactory() throws Exception {
@@ -201,60 +194,57 @@ public abstract class AbstractEditingContextTest {
     }
 
     @Test
-    public void ensureEditingContextCleanUpIsTriggeredAfterTestExecution() throws Throwable {
+    public void ensureEditingContextCleanUpIsTriggeredAfterEachTest() throws Exception {
 	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
 
-	InOrder inOrder = inOrder(editingContext, mockStatement);
+	when(mockExtensionContext.getRequiredTestInstance()).thenReturn(new StubTestCase());
 
-	editingContext.apply(mockStatement, null, mockTarget).evaluate();
+	editingContext.beforeEach(mockExtensionContext);
+	editingContext.afterEach(mockExtensionContext);
 
-	inOrder.verify(mockStatement).evaluate();
-	inOrder.verify(editingContext).after();
+	verify(editingContext).after();
     }
 
     @Test
-    public void ensureEditingContextCleanUpIsTriggeredEvenIfTestExecutionThrowsException() throws Throwable {
+    public void ensureEditingContextInitializationIsTriggeredBeforeEachTest() throws Exception {
 	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
 
-	doThrow(new Throwable("test error")).when(mockStatement).evaluate();
+	when(mockExtensionContext.getRequiredTestInstance()).thenReturn(new StubTestCase());
 
-	InOrder inOrder = inOrder(editingContext, mockStatement);
+	editingContext.beforeEach(mockExtensionContext);
 
-	try {
-	    editingContext.apply(mockStatement, null, mockTarget).evaluate();
-	} catch (Throwable exception) {
-	    // DO NOTHING
-	} finally {
-	    inOrder.verify(mockStatement).evaluate();
-	    inOrder.verify(editingContext).after();
-	}
+	verify(editingContext).before();
+
+	editingContext.afterEach(mockExtensionContext);
     }
 
     @Test
-    public void ensureEditingContextInitializationIsTriggeredBeforeTestExecution() throws Throwable {
-	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
+    public void ensureTestInstanceIsProcessedBeforeEachTest() throws Exception {
+	AbstractEditingContextRule editingContext = initEditingContext(TEST_MODEL_NAME);
 
-	InOrder inOrder = inOrder(editingContext, mockStatement);
+	StubTestCase testCase = new StubTestCase();
 
-	editingContext.apply(mockStatement, null, mockTarget).evaluate();
+	when(mockExtensionContext.getRequiredTestInstance()).thenReturn(testCase);
 
-	inOrder.verify(editingContext).before();
-	inOrder.verify(mockStatement).evaluate();
+	editingContext.beforeEach(mockExtensionContext);
+
+	assertThat(testCase.objectUnderTest(), notNullValue());
+
+	editingContext.afterEach(mockExtensionContext);
     }
 
     @Test
     public void exceptionIfCannotFindModel() throws Exception {
-	thrown.expect(IllegalArgumentException.class);
-	thrown.expectMessage(is("Cannot load model named 'UnknownModel'"));
+	IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> initEditingContext("UnknownModel"));
 
-	initEditingContext("UnknownModel");
+	assertThat(exception.getMessage(), startsWith("Cannot load model named 'UnknownModel'."));
     }
 
     @Test
     public void ignoreExceptionOnEditingContextDisposal() throws Exception {
 	AbstractEditingContextRule editingContext = Mockito.spy(initEditingContext(TEST_MODEL_NAME));
 
-	Mockito.doThrow(new NullPointerException("sample exception")).when(editingContext).dispose();
+	Mockito.doThrow(new NullPointerException("sample exception")).when(editingContext).disposeImpl();
 
 	editingContext.before();
 
@@ -346,7 +336,7 @@ public abstract class AbstractEditingContextTest {
 	assertThat(ERXEC._factory(), not(instanceOf(WOUnitEditingContextFactory.class)));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 

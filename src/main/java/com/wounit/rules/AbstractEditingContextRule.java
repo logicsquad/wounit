@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.rules;
 
@@ -20,9 +21,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.webobjects.eoaccess.EOEntity;
 import com.webobjects.eoaccess.EOModel;
@@ -44,14 +47,15 @@ import er.extensions.partials.ERXPartialInitializer;
 
 /**
  * <code>AbstractEditingContextRule</code> is a subclass of <code>ERXEC</code>
- * that implements the {@link MethodRule} interface. This class provides the
- * required infrastructure to properly initialize/dispose the <code>ERXEC</code>
+ * that implements JUnit Jupiter's {@link BeforeEachCallback} and
+ * {@link AfterEachCallback} interfaces. This class provides the required
+ * infrastructure to properly initialize/dispose the <code>ERXEC</code>
  * before/after the test execution.
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
-public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
+public abstract class AbstractEditingContextRule extends ERXEC implements BeforeEachCallback, AfterEachCallback {
     // Lazy initialization of singleton instance of ERXExtensions
     private static class SINGLETONS {
         static ERXExtensions exrExtensions = new ERXExtensions();
@@ -80,6 +84,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
     }
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractEditingContextRule.class);
 
     /**
      * Collection of models to unload after the test execution.
@@ -141,9 +147,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
         try {
             disposeImpl();
         } catch (Exception exception) {
-            System.out.println("[WARN] An exception has been thrown while disposing the " + getClass().getSimpleName() + " after the test execution.");
-
-            exception.printStackTrace();
+            LOG.warn("An exception has been thrown while disposing the {} after the test execution.", getClass().getSimpleName(), exception);
         }
 
         EOModelGroup modelGroup = EOModelGroup.defaultGroup();
@@ -167,7 +171,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
 
         for (StackTraceElement element : stackTrace) {
             if (!element.getClassName().matches("(com.wounit|org.mockito|java.lang).*")) {
-                System.out.println("[WARN] ignoring call to EOEditingContext.dispose method by the code under test at " + element.toString());
+                LOG.warn("Ignoring call to EOEditingContext.dispose method by the code under test at {}", element);
 
                 break;
             }
@@ -182,28 +186,27 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
         super.dispose();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Create the annotation processor for the test instance and set up this
+     * editing context before each JUnit Jupiter test.
      *
-     * @see org.junit.rules.MethodRule#apply(org.junit.runners.model.Statement,
-     * org.junit.runners.model.FrameworkMethod, java.lang.Object)
+     * @see #before()
      */
     @Override
-    public final Statement apply(final Statement base, FrameworkMethod method, final Object target) {
-        processor = new AnnotationProcessor(target);
+    public void beforeEach(ExtensionContext context) {
+        processor = new AnnotationProcessor(context.getRequiredTestInstance());
 
-        return new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                before();
+        before();
+    }
 
-                try {
-                    base.evaluate();
-                } finally {
-                    after();
-                }
-            }
-        };
+    /**
+     * Reset this editing context after each JUnit Jupiter test.
+     *
+     * @see #after()
+     */
+    @Override
+    public void afterEach(ExtensionContext context) {
+        after();
     }
 
     /**
@@ -245,9 +248,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
         }
 
         if (url == null) {
-            WOUnitTroubleshooter.diagnoseModelNotFound(modelName);
-
-            throw new IllegalArgumentException(String.format("Cannot load model named '%s'", modelName));
+            throw new IllegalArgumentException(WOUnitTroubleshooter.diagnoseModelNotFound(modelName));
         }
 
         modelGroup.addModelWithPathURL(url);

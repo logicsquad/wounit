@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.annotations;
 
 import java.lang.annotation.Documented;
@@ -36,7 +37,7 @@ import com.wounit.rules.TemporaryEditingContext;
  *     &#064;UnderTest
  *     private Foo foo;
  * 
- *     &#064;Rule
+ *     &#064;RegisterExtension
  *     public MockEditingContext ec = new MockEditingContext(&quot;SampleModel&quot;);
  * 
  *     &#064;Test
@@ -46,7 +47,7 @@ import com.wounit.rules.TemporaryEditingContext;
  * }
  * </pre>
  * 
- * The <code>@UnderTest</code> annotation works with both rules:
+ * The <code>@UnderTest</code> annotation works with both extensions:
  * {@link MockEditingContext} and {@link TemporaryEditingContext}.
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
@@ -56,5 +57,13 @@ import com.wounit.rules.TemporaryEditingContext;
 @Target(ElementType.FIELD)
 @Documented
 public @interface UnderTest {
+    /**
+     * The number of objects to create when the annotated field is an
+     * <code>NSArray</code>, which must declare its element type. A field of any
+     * other type gets a single object, and any other size is ignored with a
+     * warning.
+     *
+     * @return the number of objects to create
+     */
     int size() default 1;
 }

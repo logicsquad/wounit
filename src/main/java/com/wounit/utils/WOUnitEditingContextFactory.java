@@ -13,11 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.utils;
 
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOObjectStore;
 import com.wounit.rules.MockEditingContext;
+import com.wounit.rules.TemporaryEditingContext;
 
 import er.extensions.eof.ERXEC;
 
@@ -30,22 +32,22 @@ import er.extensions.eof.ERXEC;
  * provided editing context for every call to
  * <code>ERXEC.newEditingContext</code> factory methods.
  * <p>
- * The <code>WOUnitEditingContextFactory</code> may be used with the
- * {@link MockEditingContext} like this:
+ * The {@link MockEditingContext} and the {@link TemporaryEditingContext}
+ * install a <code>WOUnitEditingContextFactory</code> for themselves before each
+ * test, and put back Wonder's default factory after it. Any code under test
+ * that calls one of the <code>ERXEC.newEditingContext</code> factory methods
+ * receives the test's editing context as a result.
+ * <p>
+ * To hand out another editing context instead, install a factory for it in a
+ * <code>&#064;BeforeEach</code> method, which JUnit runs after the extension
+ * has set up:
  * 
  * <pre>
- * public MockEditingContext editingContext = new MockEditingContext();
- * 
- * &#064;Before
+ * &#064;BeforeEach
  * public void setup() {
- *     ERXEC.Factory factory = new WOUnitEditingContextFactory(editingContext);
- * 
- *     ERXEC.setFactory(factory);
+ *     ERXEC.setFactory(new WOUnitEditingContextFactory(anotherEditingContext));
  * }
  * </pre>
- * <p>
- * Any code that call one of the <code>ERXEC.newEditingContext</code> factory
- * methods after that will receive the mock editing context as a result.
  * 
  * @author <a href="mailto:hprange@gmail.com.br">Henrique Prange</a>
  * @since 1.3

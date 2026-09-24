@@ -1,0 +1,52 @@
+# Copyright (C) 2026 Logic Squad
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+
+name: Build
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build on Java ${{ matrix.java }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['21', '25']
+
+    steps:
+      - name: Check out WOUnit source code
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+
+      # Wonder and WebObjects are not on Maven Central, so the build needs
+      # the WOCommunity repository that .maven_settings.xml configures.
+      - name: Build and test with Maven
+        run: mvn --batch-mode --no-transfer-progress --settings .maven_settings.xml verify

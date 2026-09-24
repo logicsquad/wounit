@@ -13,23 +13,24 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.matchers;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hamcrest.StringDescription;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
@@ -40,7 +41,7 @@ import er.extensions.eof.ERXEnterpriseObject;
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TestCanBeDeletedMatcher {
     @Mock
     private EOEnterpriseObject mockObject;
@@ -136,7 +137,7 @@ public class TestCanBeDeletedMatcher {
 	InOrder inOrder = inOrder(mockObject);
 
 	inOrder.verify((ERXEnterpriseObject) mockObject).mightDelete();
-	inOrder.verify(mockObject).propagateDeleteWithEditingContext(Mockito.any(EOEditingContext.class));
+	inOrder.verify(mockObject).propagateDeleteWithEditingContext(Mockito.nullable(EOEditingContext.class));
 	inOrder.verify(mockObject).validateForDelete();
     }
 
@@ -154,7 +155,7 @@ public class TestCanBeDeletedMatcher {
 	inOrder.verify(mockObject).validateForDelete();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
 	matcher = new CanBeDeletedMatcher<EOEnterpriseObject>();
 

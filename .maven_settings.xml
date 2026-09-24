@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings xmlns="http://maven.apache.org/POM/4.0.0"	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                      http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <servers>
+    <!-- The Central Portal token, which the deploy workflow puts in the
+      environment -->
+    <server>
+      <id>central</id>
+      <username>${env.CENTRAL_USERNAME}</username>
+      <password>${env.CENTRAL_PASSWORD}</password>
+    </server>
+  </servers>
   <profiles>
     <profile>
       <id>default</id>
@@ -35,11 +44,4 @@
 <activeProfiles>
   <activeProfile>default</activeProfile>
 </activeProfiles>
-<servers>
-  <server>
-    <id>wocommunity.deployment</id>
-    <username>${env.CI_DEPLOY_USERNAME}</username>
-    <password>${env.CI_DEPLOY_PASSWORD}</password>
-  </server>
-</servers>
 </settings>

@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 /**
- * This package contains JUnit {@link org.junit.rules.MethodRule}
- * implementations to be used while unit testing WebObjects applications.
- * 
+ * This package contains JUnit Jupiter extensions to be used while unit
+ * testing WebObjects applications.
+ *
  * @since 1.0
- * @see org.junit.Rule
- * @see org.junit.rules.MethodRule
+ * @see org.junit.jupiter.api.extension.RegisterExtension
  */
 package com.wounit.rules;
 

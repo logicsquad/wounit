@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.rules;
 
 import static com.wounit.rules.WOUnitTroubleshooter.Utils.findAvailableModels;
@@ -22,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,7 +30,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
@@ -65,36 +64,17 @@ class WOUnitTroubleshooter {
 	protected static Set<String> findAvailableModels() {
 	    List<String> paths = new ArrayList<String>();
 
+	    for (String entry : System.getProperty("java.class.path", "").split(File.pathSeparator)) {
+		paths.addAll(findModelsInClassPathEntry(new File(entry)));
+	    }
+
 	    try {
-		ClassLoader classloader = WOUnitTroubleshooter.class.getClassLoader();
+		URL resourcesFolder = WOUnitTroubleshooter.class.getResource("/");
 
-		URL[] urls = ((URLClassLoader) classloader).getURLs();
-
-		for (URL url : urls) {
-		    if (url.getPath().endsWith(".jar")) {
-			try (JarFile jar = new JarFile(url.getPath())) {
-
-			    Enumeration<JarEntry> entries = jar.entries();
-
-			    while (entries.hasMoreElements()) {
-				String name = entries.nextElement().getName();
-
-				if (name.contains("eomodeld/index.eomodeld")) {
-				    paths.add(name);
-				}
-			    }
-			}
-		    } else {
-			File file = new File(url.toURI());
-
-			paths.addAll(findModelsRecursively(file));
-		    }
+		if (resourcesFolder != null) {
+		    paths.addAll(findModelsRecursively(new File(resourcesFolder.toURI())));
 		}
-
-		File resourcesFolder = new File(WOUnitTroubleshooter.class.getResource("/").toURI());
-
-		paths.addAll(findModelsRecursively(resourcesFolder));
-	    } catch (IOException | URISyntaxException exception) {
+	    } catch (URISyntaxException exception) {
 		// Ignore the exception and keep trying to diagnose
 	    }
 
@@ -119,11 +99,39 @@ class WOUnitTroubleshooter {
 	    return modelNames;
 	}
 
+	protected static List<String> findModelsInClassPathEntry(File entry) {
+	    if (!entry.getName().endsWith(".jar")) {
+		return findModelsRecursively(entry);
+	    }
+
+	    List<String> models = new ArrayList<String>();
+
+	    try (JarFile jar = new JarFile(entry)) {
+		Enumeration<JarEntry> entries = jar.entries();
+
+		while (entries.hasMoreElements()) {
+		    String name = entries.nextElement().getName();
+
+		    if (name.contains("eomodeld/index.eomodeld")) {
+			models.add(name);
+		    }
+		}
+	    } catch (IOException exception) {
+		// Ignore the exception and keep trying to diagnose
+	    }
+
+	    return models;
+	}
+
 	protected static List<String> findModelsRecursively(File base) {
 	    if (base.isDirectory()) {
 		File[] files = base.listFiles();
 
 		List<String> models = new ArrayList<String>();
+
+		if (files == null) {
+		    return models;
+		}
 
 		for (File file : files) {
 		    models.addAll(findModelsRecursively(file));
@@ -185,35 +193,38 @@ class WOUnitTroubleshooter {
 	}
     }
 
-    static final AtomicBoolean ALREADY_DIAGNOSED = new AtomicBoolean(false);
-
     /**
      * Diagnose eomodel not found errors.
-     * 
+     *
      * @param modelName
      *            the name of the model not found
+     * @return a message saying the model could not be loaded, suggesting a
+     *         similar model name if there is one, and listing the available
+     *         models
      */
-    static void diagnoseModelNotFound(String modelName) {
-	if (!ALREADY_DIAGNOSED.compareAndSet(false, true)) {
-	    return;
-	}
-
+    static String diagnoseModelNotFound(String modelName) {
 	Set<String> models = findAvailableModels();
 
-	System.out.print(String.format("A model named '%s' could not be found.", modelName));
+	StringBuilder message = new StringBuilder(String.format("Cannot load model named '%s'.", modelName));
 
 	if (modelName != null) {
 	    String suggestedName = findSimilarModelName(models, modelName);
 
 	    if (suggestedName != null) {
-		System.out.print(String.format(" Did you mean '%s'?", suggestedName));
+		message.append(String.format(" Did you mean '%s'?", suggestedName));
 	    }
 	}
 
-	System.out.println(" Available models:");
+	if (models.isEmpty()) {
+	    message.append(" No models are available.");
+	} else {
+	    message.append(" Available models:");
 
-	for (String model : models) {
-	    System.out.println(String.format("  - %s", model));
+	    for (String model : models) {
+		message.append(String.format("\n  - %s", model));
+	    }
 	}
+
+	return message.toString();
     }
 }

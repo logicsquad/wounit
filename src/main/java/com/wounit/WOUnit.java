@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit;
 
 import java.util.ResourceBundle;
@@ -26,7 +27,7 @@ import java.util.ResourceBundle;
  */
 public class WOUnit {
     /**
-     * This method can be used to obtain the current version of JUnit.
+     * This method can be used to obtain the current version of WOUnit.
      * 
      * @return Returns the current version of WOUnit library.
      */

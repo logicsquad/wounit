@@ -13,20 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.matchers;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.hamcrest.Description;
 import org.hamcrest.StringDescription;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.foundation.NSValidation;
@@ -34,7 +35,7 @@ import com.webobjects.foundation.NSValidation;
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TestSaveChangesMatcher {
     private SaveChangesMatcher<EOEditingContext> matcher;
 
@@ -121,7 +122,7 @@ public class TestSaveChangesMatcher {
 	assertThat(result, is(false));
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
 	matcher = new SaveChangesMatcher<EOEditingContext>();
 

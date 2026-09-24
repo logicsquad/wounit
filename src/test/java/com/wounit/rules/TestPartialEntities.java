@@ -13,17 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.rules;
 
 import static com.wounit.matchers.EOAssert.canBeSaved;
 import static com.wounit.matchers.EOAssert.confirm;
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.wounit.annotations.UnderTest;
 import com.wounit.model.AugmentedEntity;
@@ -38,14 +39,14 @@ import er.extensions.foundation.ERXProperties;
 public class TestPartialEntities {
     private static String UPDATE_INVERSE_RELATIONSHIPS;
 
-    @BeforeClass
+    @BeforeAll
     public static void prepareProperties() {
 	UPDATE_INVERSE_RELATIONSHIPS = ERXProperties.stringForKey("er.extensions.ERXEnterpriseObject.updateInverseRelationships");
 
 	ERXProperties.setStringForKey("true", "er.extensions.ERXEnterpriseObject.updateInverseRelationships");
     }
 
-    @AfterClass
+    @AfterAll
     public static void revertProperties() {
 	if (UPDATE_INVERSE_RELATIONSHIPS == null) {
 	    ERXProperties.removeKey("er.extensions.ERXEnterpriseObject.updateInverseRelationships");
@@ -57,7 +58,7 @@ public class TestPartialEntities {
     @UnderTest
     private BaseEntity base;
 
-    @Rule
+    @RegisterExtension
     public MockEditingContext editingContext = new MockEditingContext("PartialsTest");
 
     @Test

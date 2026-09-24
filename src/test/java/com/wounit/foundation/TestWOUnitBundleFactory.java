@@ -13,20 +13,22 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.foundation;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.webobjects.foundation.NSBundle;
 import com.webobjects.foundation.development.NSLegacyBundle;
@@ -35,7 +37,7 @@ import com.wounit.foundation.WOUnitBundleFactory;
 /**
  * @author <a href="mailto:hprange@gmail.com.br">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TestWOUnitBundleFactory {
     private WOUnitBundleFactory factory;
 
@@ -70,9 +72,9 @@ public class TestWOUnitBundleFactory {
 	assertThat(result, nullValue());
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
-	when(mockLegacyBundleFactory.bundleForPath(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(mockBundle);
+	lenient().when(mockLegacyBundleFactory.bundleForPath(Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(mockBundle);
 
 	factory = new WOUnitBundleFactory(mockLegacyBundleFactory);
     }

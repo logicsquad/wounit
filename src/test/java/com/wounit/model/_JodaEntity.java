@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 // $LastChangedRevision$ DO NOT EDIT.  Make changes to JodaEntity.java instead.
 package com.wounit.model;
 
@@ -21,7 +22,8 @@ import com.webobjects.eocontrol.*;
 import com.webobjects.foundation.*;
 import java.math.*;
 import java.util.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("all")
 public abstract class _JodaEntity extends er.extensions.eof.ERXGenericRecord {
@@ -35,7 +37,7 @@ public abstract class _JodaEntity extends er.extensions.eof.ERXGenericRecord {
 
 	// Relationships
 
-  private static Logger LOG = Logger.getLogger(_JodaEntity.class);
+  private static Logger LOG = LoggerFactory.getLogger(_JodaEntity.class);
 
   public JodaEntity localInstanceIn(EOEditingContext editingContext) {
     JodaEntity localInstance = (JodaEntity)EOUtilities.localInstanceOfObject(editingContext, this);

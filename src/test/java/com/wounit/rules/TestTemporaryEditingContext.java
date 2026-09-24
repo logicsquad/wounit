@@ -13,17 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.rules;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Field;
 import java.net.URL;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.webobjects.eoaccess.EOModel;
 import com.webobjects.eoaccess.EOModelGroup;
@@ -46,7 +49,7 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
-    @Ignore("Don't know how to clean the mess in the adaptor context after the test")
+    @Disabled("Don't know how to clean the mess in the adaptor context after the test")
     public void doNotClearTheDatabaseContextIfNoModelsLoaded() throws Throwable {
 	EOModelGroup modelGroup = EOModelGroup.defaultGroup();
 
@@ -67,7 +70,7 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
     }
 
     @Test
-    @Ignore("Don't know how to clean the mess in the adaptor context after the test")
+    @Disabled("Don't know how to clean the mess in the adaptor context after the test")
     public void exceptionIfAdaptorContextIsNotMemoryAdaptor() throws Throwable {
 	TemporaryEditingContext editingContext = new TemporaryEditingContext(TEST_MODEL_NAME);
 
@@ -79,10 +82,9 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 
 	editingContext.before();
 
-	thrown.expect(IllegalStateException.class);
-	thrown.expectMessage(is("Expected er.memoryadaptor.ERMemoryAdaptorContext, but got com.webobjects.jdbcadaptor.JDBCContext. Please, use the TemporaryEditingContext constructor to load all the required models for testing."));
+	IllegalStateException exception = assertThrows(IllegalStateException.class, () -> editingContext.after());
 
-	editingContext.after();
+	assertThat(exception.getMessage(), is("Expected er.memoryadaptor.ERMemoryAdaptorContext, but got com.webobjects.jdbcadaptor.JDBCContext. Please, use the TemporaryEditingContext constructor to load all the required models for testing."));
     }
 
     @Test
@@ -96,15 +98,12 @@ public class TestTemporaryEditingContext extends AbstractEditingContextTest {
 
 	NSBundle bundleToRestore = bundles.remove(JAVA_MEMORY_ADAPTOR_BUNDLE_NAME);
 
-	thrown.expect(WOUnitException.class);
-	thrown.expectMessage("The JavaMemoryAdaptor bundle is not loaded. Are you sure the JavaMemoryAdaptor framework is in the test classpath?");
-
 	try {
-	    new TemporaryEditingContext();
-	} catch (Exception exception) {
-	    bundles.takeValueForKey(bundleToRestore, JAVA_MEMORY_ADAPTOR_BUNDLE_NAME);
+	    WOUnitException exception = assertThrows(WOUnitException.class, () -> new TemporaryEditingContext());
 
-	    throw exception;
+	    assertThat(exception.getMessage(), containsString("The JavaMemoryAdaptor bundle is not loaded. Are you sure the JavaMemoryAdaptor framework is in the test classpath?"));
+	} finally {
+	    bundles.takeValueForKey(bundleToRestore, JAVA_MEMORY_ADAPTOR_BUNDLE_NAME);
 	}
     }
 

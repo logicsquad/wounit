@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.rules;
 
 import static com.wounit.matchers.EOAssert.confirm;
@@ -22,14 +23,14 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.wounit.annotations.UnderTest;
 import com.wounit.model.JodaEntity;
 
 public class TestJodaTimeSupport {
-    @Rule
+    @RegisterExtension
     public MockEditingContext editingContext = new MockEditingContext("Test");
 
     @UnderTest

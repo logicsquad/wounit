@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.matchers;
 
 import com.webobjects.foundation.NSArray;
@@ -22,21 +23,18 @@ import com.wounit.model.FooEntity;
 import com.wounit.model.FooEntityWithRequiredField;
 import com.wounit.rules.MockEditingContext;
 import er.extensions.eof.ERXKey;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.wounit.matchers.EOAssert.hasValueForKey;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestHasValueForKeyMatcher {
-    @Rule
+    @RegisterExtension
     public final MockEditingContext editingContext = new MockEditingContext("Test");
-
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
 
     @Dummy
     FooEntity foo;
@@ -46,10 +44,8 @@ public class TestHasValueForKeyMatcher {
 
     NSArray<FooEntity> foos;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        thrown.handleAssertionErrors();
-
         foo.setBar("sample");
 
         foos = new NSMutableArray<>();
@@ -65,10 +61,9 @@ public class TestHasValueForKeyMatcher {
 
     @Test
     public void hasValueForKeyWhenValueIsWrong() {
-        thrown.expect(AssertionError.class);
-        thrown.expectMessage(is("\nExpected: hasValueForKey(\"bar\", is \"wrong\")\n     but: was \"sample\""));
+        AssertionError error = assertThrows(AssertionError.class, () -> assertThat(foo, hasValueForKey(FooEntity.BAR_KEY, is("wrong"))));
 
-        assertThat(foo, hasValueForKey(FooEntity.BAR_KEY, is("wrong")));
+        assertThat(error.getMessage(), is("\nExpected: hasValueForKey(\"bar\", is \"wrong\")\n     but: was \"sample\""));
     }
 
     @Test
@@ -80,27 +75,24 @@ public class TestHasValueForKeyMatcher {
     public void hasValueForKeyInEmptyArray() {
         foos.clear();
 
-        thrown.expect(AssertionError.class);
-        thrown.expectMessage(is("\nExpected: a collection containing hasValueForKey(\"bar\", is \"sample\")\n     but: "));
+        AssertionError error = assertThrows(AssertionError.class, () -> assertThat(foos, hasItem(hasValueForKey(FooEntity.BAR_KEY, is("sample")))));
 
-        assertThat(foos, hasItem(hasValueForKey(FooEntity.BAR_KEY, is("sample"))));
+        assertThat(error.getMessage(), is("\nExpected: a collection containing hasValueForKey(\"bar\", is \"sample\")\n     but: was empty"));
     }
 
     @Test
     public void hasValueForKeyInArrayWithWrongValue() {
-        thrown.expect(AssertionError.class);
-        thrown.expectMessage(is("\nExpected: a collection containing hasValueForKey(\"bar\", is \"wrong\")\n     but: was \"sample\""));
+        AssertionError error = assertThrows(AssertionError.class, () -> assertThat(foos, hasItem(hasValueForKey(FooEntity.BAR_KEY, is("wrong")))));
 
-        assertThat(foos, hasItem(hasValueForKey(FooEntity.BAR_KEY, is("wrong"))));
+        assertThat(error.getMessage(), is("\nExpected: a collection containing hasValueForKey(\"bar\", is \"wrong\")\n     but: mismatches were: [was \"sample\"]"));
     }
 
     @Test
     public void hasValueForKeyWhenKeyDoesNotExist() {
-        thrown.expect(AssertionError.class);
-        thrown.expectMessage(both(startsWith("\nExpected: hasValueForKey(\"unknown\", is \"sample\")\n     but: <com.wounit.model.FooEntity"))
-                .and(endsWith("valueForKey(): lookup of unknown key: 'unknown'.\nThis class does not have an instance variable of the name unknown or _unknown, nor a method of the name unknown, _unknown, getUnknown, or _getUnknown")));
+        AssertionError error = assertThrows(AssertionError.class, () -> assertThat(foo, hasValueForKey("unknown", is("sample"))));
 
-        assertThat(foo, hasValueForKey("unknown", is("sample")));
+        assertThat(error.getMessage(), both(startsWith("\nExpected: hasValueForKey(\"unknown\", is \"sample\")\n     but: <com.wounit.model.FooEntity"))
+                .and(endsWith("valueForKey(): lookup of unknown key: 'unknown'.\nThis class does not have an instance variable of the name unknown or _unknown, nor a method of the name unknown, _unknown, getUnknown, or _getUnknown")));
     }
 
     @Test
@@ -112,37 +104,33 @@ public class TestHasValueForKeyMatcher {
 
     @Test
     public void hasValueForKeyWhenKeyPathDoesNotExist() {
-        thrown.expect(AssertionError.class);
-        thrown.expectMessage(both(startsWith("\nExpected: hasValueForKey(\"fooEntity.unknown\", is \"sample\")\n     but: <com.wounit.model.FooEntity"))
-                .and(endsWith("valueForKey(): lookup of unknown key: 'unknown'.\nThis class does not have an instance variable of the name unknown or _unknown, nor a method of the name unknown, _unknown, getUnknown, or _getUnknown")));
-
         String keypath = FooEntityWithRequiredField.FOO_ENTITY_KEY + ".unknown";
 
-        assertThat(relatedFoo, hasValueForKey(keypath, is("sample")));
+        AssertionError error = assertThrows(AssertionError.class, () -> assertThat(relatedFoo, hasValueForKey(keypath, is("sample"))));
+
+        assertThat(error.getMessage(), both(startsWith("\nExpected: hasValueForKey(\"fooEntity.unknown\", is \"sample\")\n     but: <com.wounit.model.FooEntity"))
+                .and(endsWith("valueForKey(): lookup of unknown key: 'unknown'.\nThis class does not have an instance variable of the name unknown or _unknown, nor a method of the name unknown, _unknown, getUnknown, or _getUnknown")));
     }
 
     @Test
     public void hasValueForKeyWhenObjectIsNull() {
-        thrown.expect(AssertionError.class);
-        thrown.expectMessage(is("\nExpected: hasValueForKey(\"bar\", is \"sample\")\n     but: was null"));
+        AssertionError error = assertThrows(AssertionError.class, () -> assertThat(null, hasValueForKey(FooEntity.BAR_KEY, is("sample"))));
 
-        assertThat(null, hasValueForKey(FooEntity.BAR_KEY, is("sample")));
+        assertThat(error.getMessage(), is("\nExpected: hasValueForKey(\"bar\", is \"sample\")\n     but: was null"));
     }
 
     @Test
     public void hasValueForKeyWhenKeyIsNull() {
-        thrown.expect(AssertionError.class);
-        thrown.expectMessage(is("\nExpected: hasValueForKey(null, is \"sample\")\n     but: No value for null key"));
+        AssertionError error = assertThrows(AssertionError.class, () -> assertThat(foo, hasValueForKey((String) null, is("sample"))));
 
-        assertThat(foo, hasValueForKey((String) null, is("sample")));
+        assertThat(error.getMessage(), is("\nExpected: hasValueForKey(null, is \"sample\")\n     but: No value for null key"));
     }
 
     @Test
     public void hasValueForKeyWhenValueIsNull() {
-        thrown.expect(AssertionError.class);
-        thrown.expectMessage(is("\nExpected: hasValueForKey(\"bar\", is null)\n     but: was \"sample\""));
+        AssertionError error = assertThrows(AssertionError.class, () -> assertThat(foo, hasValueForKey(FooEntity.BAR_KEY, is((String) null))));
 
-        assertThat(foo, hasValueForKey(FooEntity.BAR_KEY, is((String) null)));
+        assertThat(error.getMessage(), is("\nExpected: hasValueForKey(\"bar\", is null)\n     but: was \"sample\""));
     }
 
     @Test

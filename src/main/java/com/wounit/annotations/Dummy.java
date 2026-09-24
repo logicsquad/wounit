@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.annotations;
 
@@ -35,12 +36,12 @@ import com.wounit.rules.TemporaryEditingContext;
  *     &#064;Dummy
  *     private Bar bar;
  * 
- *     &#064;Rule
+ *     &#064;RegisterExtension
  *     public MockEditingContext ec = new MockEditingContext(&quot;SampleModel&quot;);
  * 
  *     private Foo foo;
  * 
- *     &#064;Before
+ *     &#064;BeforeEach
  *     public void setup() {
  * 	foo = Foo.createFoo(ec);
  * 
@@ -59,5 +60,13 @@ import com.wounit.rules.TemporaryEditingContext;
 @Target(ElementType.FIELD)
 @Documented
 public @interface Dummy {
+    /**
+     * The number of objects to create when the annotated field is an
+     * <code>NSArray</code>, which must declare its element type. A field of any
+     * other type gets a single object, and any other size is ignored with a
+     * warning.
+     *
+     * @return the number of objects to create
+     */
     int size() default 1;
 }
