@@ -26,7 +26,12 @@ permissions:
 
 jobs:
   build:
+    name: Build on Java ${{ matrix.java }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['21', '25']
 
     steps:
       - name: Check out WOUnit source code
@@ -34,11 +39,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up JDK 21
+      - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: ${{ matrix.java }}
           cache: maven
 
       # Wonder and WebObjects are not on Maven Central, so the build needs
