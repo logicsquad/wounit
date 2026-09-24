@@ -119,6 +119,11 @@
 				<plugin>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>3.12.0</version>
+					<configuration>
+						<!-- The default footer credits the organization with the whole project;
+							this one follows the source headers -->
+						<bottom><![CDATA[Copyright &#169; 2009 Henrique Prange. Modifications copyright &#169; 2026 Logic Squad. Licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.]]></bottom>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
