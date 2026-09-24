@@ -21,6 +21,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -45,14 +48,15 @@ import er.extensions.partials.ERXPartialInitializer;
 
 /**
  * <code>AbstractEditingContextRule</code> is a subclass of <code>ERXEC</code>
- * that implements the {@link MethodRule} interface. This class provides the
- * required infrastructure to properly initialize/dispose the <code>ERXEC</code>
- * before/after the test execution.
+ * that implements the {@link MethodRule} interface, and JUnit Jupiter's
+ * {@link BeforeEachCallback} and {@link AfterEachCallback} interfaces. This
+ * class provides the required infrastructure to properly initialize/dispose
+ * the <code>ERXEC</code> before/after the test execution.
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
-public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule {
+public abstract class AbstractEditingContextRule extends ERXEC implements MethodRule, BeforeEachCallback, AfterEachCallback {
     // Lazy initialization of singleton instance of ERXExtensions
     private static class SINGLETONS {
         static ERXExtensions exrExtensions = new ERXExtensions();
@@ -205,6 +209,29 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Method
                 }
             }
         };
+    }
+
+    /**
+     * Create the annotation processor for the test instance and set up this
+     * editing context before each JUnit Jupiter test.
+     *
+     * @see #before()
+     */
+    @Override
+    public void beforeEach(ExtensionContext context) {
+        processor = new AnnotationProcessor(context.getRequiredTestInstance());
+
+        before();
+    }
+
+    /**
+     * Reset this editing context after each JUnit Jupiter test.
+     *
+     * @see #after()
+     */
+    @Override
+    public void afterEach(ExtensionContext context) {
+        after();
     }
 
     /**

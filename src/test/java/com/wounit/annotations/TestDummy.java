@@ -19,17 +19,17 @@ package com.wounit.annotations;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.webobjects.foundation.NSArray;
 import com.wounit.model.FooEntity;
@@ -39,14 +39,14 @@ import com.wounit.rules.MockEditingContext;
 /**
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TestDummy {
     @Dummy(size = 2)
     private NSArray<FooEntity> dummies;
 
-    // Spied here rather than with @Spy: Mockito's runner only creates @Spy
-    // fields after JUnit has collected the rules, so the rule would be unspied.
-    @Rule
+    // Spied here rather than with @Spy: MockitoExtension would only replace
+    // the field after JUnit had registered the unspied editing context.
+    @RegisterExtension
     public MockEditingContext mockEditingContext = spy(new MockEditingContext("Test"));
 
     @Dummy

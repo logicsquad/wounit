@@ -28,3 +28,6 @@ Changelog
   ([#5](https://github.com/logicsquad/wounit/issues/5))
 * WOUnit depends on `org.hamcrest:hamcrest` 3.0 instead of
   `hamcrest-core` 1.3. ([#2](https://github.com/logicsquad/wounit/issues/2))
+* `MockEditingContext` and `TemporaryEditingContext` are JUnit Jupiter
+  extensions: register them with `@RegisterExtension`.
+  ([#3](https://github.com/logicsquad/wounit/issues/3))
