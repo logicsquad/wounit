@@ -351,6 +351,7 @@ public class EOAssert {
     /**
      * Used to check whether a value matches an expression using the key-value coding mechanism.
      *
+     * @param <T>          the type of the examined object
      * @param key          identifies the property to retrieve
      * @param valueMatcher a matcher for the value obtained using the key of the examined object
      * @return a <code>Matcher</code> matching if the value matches an expression using the key-value
@@ -363,6 +364,8 @@ public class EOAssert {
     /**
      * Used to check whether a value matches an expression using the key-value coding mechanism.
      *
+     * @param <T>          the type of the examined object
+     * @param <V>          the type of the value that the key identifies
      * @param key          identifies the property to retrieve
      * @param valueMatcher a matcher for the value obtained using the key of the examined object
      * @return a <code>Matcher</code> matching if the value matches an expression using the key-value

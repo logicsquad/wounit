@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.foundation;
 
 import com.webobjects.foundation.NSBundle;
@@ -33,6 +34,11 @@ import com.webobjects.foundation.development.NSLegacyBundle.Factory;
 public class WOUnitBundleFactory extends NSBundleFactory {
     private final NSBundleFactory factory;
 
+    /**
+     * Creates a bundle factory that delegates to an
+     * {@link NSLegacyBundle.Factory}. WOUnit registers this class through the
+     * <code>NSBundleFactories</code> property.
+     */
     public WOUnitBundleFactory() {
 	this(new NSLegacyBundle.Factory());
     }
