@@ -26,6 +26,8 @@ import java.util.List;
 
 import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.foundation.NSArray;
@@ -41,6 +43,8 @@ import com.wounit.exceptions.WOUnitException;
  * @since 1.1
  */
 class AnnotationProcessor {
+    private static final Logger LOG = LoggerFactory.getLogger(AnnotationProcessor.class);
+
     private static EOEnterpriseObject createEOForType(Class<?> type, Class<? extends Annotation> annotation, EditingContextFacade facade) {
         if (!EOEnterpriseObject.class.isAssignableFrom(type)) {
             throw new WOUnitException("Cannot create object of type " + type.getName() + ".\n Only fields and arrays of type " + EOEnterpriseObject.class.getName() + " can be annotated with @" + annotation.getSimpleName() + ".");
@@ -150,7 +154,7 @@ class AnnotationProcessor {
         }
 
         if (size != 1) {
-            System.out.println("[WARN] The field " + field.getName() + " isn't of NSArray type, but it is annotated with the size property.");
+            LOG.warn("The field {} isn't of NSArray type, but it is annotated with the size property.", field.getName());
         }
 
         if (isMockitoPresent && field.isAnnotationPresent(Spy.class)) {

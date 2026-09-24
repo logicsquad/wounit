@@ -32,3 +32,6 @@ Changelog
   extensions: register them with `@RegisterExtension` instead of `@Rule`.
   JUnit 4 is no longer supported.
   ([#3](https://github.com/logicsquad/wounit/issues/3))
+* WOUnit logs its warnings through SLF4J instead of printing them to
+  `System.out`. It uses your project's `slf4j-api`, and works with
+  SLF4J 1.7 and 2.x. ([#8](https://github.com/logicsquad/wounit/issues/8))

@@ -24,6 +24,8 @@ import java.util.Collection;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.webobjects.eoaccess.EOEntity;
 import com.webobjects.eoaccess.EOModel;
@@ -82,6 +84,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
     }
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractEditingContextRule.class);
 
     /**
      * Collection of models to unload after the test execution.
@@ -143,9 +147,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
         try {
             disposeImpl();
         } catch (Exception exception) {
-            System.out.println("[WARN] An exception has been thrown while disposing the " + getClass().getSimpleName() + " after the test execution.");
-
-            exception.printStackTrace();
+            LOG.warn("An exception has been thrown while disposing the {} after the test execution.", getClass().getSimpleName(), exception);
         }
 
         EOModelGroup modelGroup = EOModelGroup.defaultGroup();
@@ -169,7 +171,7 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
 
         for (StackTraceElement element : stackTrace) {
             if (!element.getClassName().matches("(com.wounit|org.mockito|java.lang).*")) {
-                System.out.println("[WARN] ignoring call to EOEditingContext.dispose method by the code under test at " + element.toString());
+                LOG.warn("Ignoring call to EOEditingContext.dispose method by the code under test at {}", element);
 
                 break;
             }

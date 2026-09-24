@@ -13,12 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.rules;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.webobjects.eoaccess.EOAdaptorContext;
 import com.webobjects.eoaccess.EODatabaseContext;
@@ -62,6 +66,8 @@ import er.memoryadaptor.ERMemoryAdaptorContext;
  */
 public class TemporaryEditingContext extends AbstractEditingContextRule {
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(TemporaryEditingContext.class);
 
     /**
      * Map of original adaptor name for each loaded <code>EOModel</code> to be
@@ -117,7 +123,7 @@ public class TemporaryEditingContext extends AbstractEditingContextRule {
 	    EOModel model = modelGroup.modelNamed(modelName);
 
 	    if (model == null) {
-		System.out.println("[WARN] Cannot restore the adaptor configuration for model named " + modelName);
+		LOG.warn("Cannot restore the adaptor configuration for model named {}", modelName);
 
 		continue;
 	    }
