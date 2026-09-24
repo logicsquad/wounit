@@ -15,6 +15,7 @@
     the License.
 
 -->
+<!-- Modifications copyright (C) 2026 Logic Squad. -->
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
@@ -22,17 +23,17 @@
     <TITLE>API Overview</TITLE>
   </HEAD>
   <BODY>
-    The WOUnit framework contains a set of utilities for testing WebObjects applications using JUnit 4.7 or later.
+    The WOUnit framework contains a set of utilities for testing WebObjects applications with JUnit 6.
     <P>
     Here is a simple test case written using WOUnit capabilities.
     <PRE>
-import static com.wounit.EOAssert.*;
+import static com.wounit.matchers.EOAssert.*;
 import com.wounit.rules.MockEditingContext;
 import com.wounit.annotations.Dummy;
 import com.wounit.annotations.UnderTest;
 
 public class TestFoo {
-   &#64;Rule
+   &#64;RegisterExtension
    public MockEditingContext editingContext = new MockEditingContext(&quot;FooModel&quot;);
 
    &#64;Dummy
@@ -52,12 +53,12 @@ public class TestFoo {
     <P>
     Here is another test case written using WOUnit capabilities.
     <PRE>
-import static com.wounit.EOAssert.*;
+import static com.wounit.matchers.EOAssert.*;
 import com.wounit.rules.TemporaryEditingContext;
 import com.wounit.annotations.UnderTest;
 
 public class TestFoo {
-   &#64;Rule
+   &#64;RegisterExtension
    public TemporaryEditingContext editingContext = new TemporaryEditingContext(&quot;FooModel&quot;);
 
    &#64;UnderTest
@@ -72,18 +73,18 @@ public class TestFoo {
 }
     </PRE>
     <P>
-    WOUnit can also be used in combination with <A HREF="http://code.google.com/p/mockito/" TARGET="_blank">Mockito</A> for advanced testing.
+    WOUnit can also be used in combination with <A HREF="https://site.mockito.org/" TARGET="_blank">Mockito</A> for advanced testing.
     <PRE>
-import static com.wounit.EOAssert.*;
+import static com.wounit.matchers.EOAssert.*;
 import com.wounit.rules.MockEditingContext;
 import com.wounit.annotations.UnderTest;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-&#64;RunWith(MockitoJUnitRunner.class)
+&#64;ExtendWith(MockitoExtension.class)
 public class TestFoo {
-   &#64;Rule
+   &#64;RegisterExtension
    public MockEditingContext editingContext = new MockEditingContext(&quot;FooModel&quot;);
 
    &#64;Spy &#64;UnderTest
