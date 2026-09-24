@@ -20,6 +20,10 @@ Changelog
 2.0 (unreleased)
 ----------------
 
+* WOUnit is published to Maven Central as `net.logicsquad:wounit`,
+  instead of `com.wounit:wounit` on WOCommunity's repository. Its Java
+  packages haven't changed.
+  ([#7](https://github.com/logicsquad/wounit/issues/7))
 * WOUnit requires Java 21. ([#1](https://github.com/logicsquad/wounit/issues/1))
 * A missing EOModel fails with an `IllegalArgumentException` again on
   Java 9 and later, instead of a `ClassCastException`. Its message now

@@ -67,6 +67,8 @@
 		<maven.compiler.release>21</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<!-- A rehearsal of the deploy workflow sets this to false -->
+		<central.autoPublish>true</central.autoPublish>
 	</properties>
 
 	<profiles>
@@ -85,6 +87,41 @@
 								</goals>
 							</execution>
 						</executions>
+					</plugin>
+					<plugin>
+						<!-- Signs with the key that the deploy workflow imports, using the
+							passphrase in MAVEN_GPG_PASSPHRASE -->
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.2.8</version>
+						<configuration>
+							<gpgArguments>
+								<arg>--batch</arg>
+								<arg>--yes</arg>
+								<arg>--pinentry-mode</arg>
+								<arg>loopback</arg>
+							</gpgArguments>
+						</configuration>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<!-- Uploads to the Central Portal, with the credentials of the
+							central server in .maven_settings.xml -->
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.11.0</version>
+						<extensions>true</extensions>
+						<configuration>
+							<publishingServerId>central</publishingServerId>
+							<autoPublish>${central.autoPublish}</autoPublish>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
