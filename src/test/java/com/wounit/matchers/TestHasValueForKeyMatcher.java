@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.matchers;
 
 import com.webobjects.foundation.NSArray;
@@ -81,7 +82,7 @@ public class TestHasValueForKeyMatcher {
         foos.clear();
 
         thrown.expect(AssertionError.class);
-        thrown.expectMessage(is("\nExpected: a collection containing hasValueForKey(\"bar\", is \"sample\")\n     but: "));
+        thrown.expectMessage(is("\nExpected: a collection containing hasValueForKey(\"bar\", is \"sample\")\n     but: was empty"));
 
         assertThat(foos, hasItem(hasValueForKey(FooEntity.BAR_KEY, is("sample"))));
     }
@@ -89,7 +90,7 @@ public class TestHasValueForKeyMatcher {
     @Test
     public void hasValueForKeyInArrayWithWrongValue() {
         thrown.expect(AssertionError.class);
-        thrown.expectMessage(is("\nExpected: a collection containing hasValueForKey(\"bar\", is \"wrong\")\n     but: was \"sample\""));
+        thrown.expectMessage(is("\nExpected: a collection containing hasValueForKey(\"bar\", is \"wrong\")\n     but: mismatches were: [was \"sample\"]"));
 
         assertThat(foos, hasItem(hasValueForKey(FooEntity.BAR_KEY, is("wrong"))));
     }

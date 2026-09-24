@@ -26,3 +26,5 @@ Changelog
   suggests a similarly named model and lists the available models,
   which WOUnit used to print to the console instead.
   ([#5](https://github.com/logicsquad/wounit/issues/5))
+* WOUnit depends on `org.hamcrest:hamcrest` 3.0 instead of
+  `hamcrest-core` 1.3. ([#2](https://github.com/logicsquad/wounit/issues/2))

@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.matchers;
 
 import com.webobjects.eocontrol.EOEditingContext;
@@ -32,7 +33,7 @@ import static org.hamcrest.CoreMatchers.not;
  * in order to write more readable code:
  * 
  * <pre>
- * import static com.wounit.EOAssert.*;
+ * import static com.wounit.matchers.EOAssert.*;
  * </pre>
  *
  * The {@code EOAssert} class provides static methods to check whether an
@@ -133,8 +134,8 @@ import static org.hamcrest.CoreMatchers.not;
  *
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
- * @see org.junit.Assert
- * @see org.junit.matchers.JUnitMatchers
+ * @see org.hamcrest.MatcherAssert
+ * @see org.hamcrest.CoreMatchers
  */
 public class EOAssert {
     /**
@@ -225,7 +226,6 @@ public class EOAssert {
      *            an expression, built of {@link Matcher}s, specifying allowed
      *            values
      * @see org.hamcrest.CoreMatchers
-     * @see org.junit.matchers.JUnitMatchers
      */
     public static <T extends EOEnterpriseObject> void confirm(T enterpriseObject, Matcher<T> matcher) {
 	confirmImplementation(enterpriseObject, matcher);
@@ -251,7 +251,6 @@ public class EOAssert {
      *            an expression, built of {@link Matcher}s, specifying allowed
      *            values
      * @see org.hamcrest.CoreMatchers
-     * @see org.junit.matchers.JUnitMatchers
      */
     public static <T extends EOEditingContext> void confirm(T actual, Matcher<T> matcher) {
 	confirmImplementation(actual, matcher);

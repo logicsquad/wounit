@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.matchers;
 
@@ -57,7 +58,7 @@ abstract class AbstractEnhancedTypeSafeMatcher<T> extends TypeSafeMatcher<T> {
     /**
      * Checks whether an object matches an expected condition.
      * 
-     * @see org.junit.internal.matchers.TypeSafeMatcher#matchesSafely(java.lang.Object)
+     * @see org.hamcrest.TypeSafeMatcher#matchesSafely(java.lang.Object)
      */
     @Override
     public final boolean matchesSafely(T item) {
