@@ -35,3 +35,8 @@ Changelog
 * WOUnit logs its warnings through SLF4J instead of printing them to
   `System.out`. It uses your project's `slf4j-api`, and works with
   SLF4J 1.7 and 2.x. ([#8](https://github.com/logicsquad/wounit/issues/8))
+* WOUnit uses your project's Wonder and WebObjects instead of bringing
+  its own, and is built and tested against Wonder 7.4. If you use
+  `TemporaryEditingContext`, add `wonder.eoadaptors:JavaMemoryAdaptor` to
+  your test dependencies.
+  ([#11](https://github.com/logicsquad/wounit/issues/11))

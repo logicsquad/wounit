@@ -229,15 +229,19 @@
 	</dependencyManagement>
 
 	<dependencies>
+		<!-- Wonder and WebObjects are provided: every project that uses WOUnit
+			has its own, so WOUnit doesn't bring different versions -->
 		<dependency>
 			<groupId>wonder.core</groupId>
 			<artifactId>ERFoundation</artifactId>
 			<version>1.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>wonder.core</groupId>
 			<artifactId>ERExtensions</artifactId>
 			<version>${wonder.version}</version>
+			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<artifactId>junit</artifactId>
@@ -249,6 +253,7 @@
 			<groupId>wonder.eoadaptors</groupId>
 			<artifactId>JavaMemoryAdaptor</artifactId>
 			<version>${wonder.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>wonder.eof</groupId>
@@ -260,16 +265,19 @@
 			<groupId>com.webobjects</groupId>
 			<artifactId>JavaFoundation</artifactId>
 			<version>${webobjects.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.webobjects</groupId>
 			<artifactId>JavaEOAccess</artifactId>
 			<version>${webobjects.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.webobjects</groupId>
 			<artifactId>JavaEOControl</artifactId>
 			<version>${webobjects.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
