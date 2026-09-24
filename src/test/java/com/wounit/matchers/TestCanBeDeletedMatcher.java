@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.matchers;
 
@@ -29,7 +30,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
@@ -136,7 +137,7 @@ public class TestCanBeDeletedMatcher {
 	InOrder inOrder = inOrder(mockObject);
 
 	inOrder.verify((ERXEnterpriseObject) mockObject).mightDelete();
-	inOrder.verify(mockObject).propagateDeleteWithEditingContext(Mockito.any(EOEditingContext.class));
+	inOrder.verify(mockObject).propagateDeleteWithEditingContext(Mockito.nullable(EOEditingContext.class));
 	inOrder.verify(mockObject).validateForDelete();
     }
 

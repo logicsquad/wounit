@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.annotations;
 
@@ -21,13 +22,14 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.webobjects.foundation.NSArray;
 import com.wounit.model.FooEntity;
@@ -42,9 +44,10 @@ public class TestDummy {
     @Dummy(size = 2)
     private NSArray<FooEntity> dummies;
 
-    @Spy
+    // Spied here rather than with @Spy: Mockito's runner only creates @Spy
+    // fields after JUnit has collected the rules, so the rule would be unspied.
     @Rule
-    public MockEditingContext mockEditingContext = new MockEditingContext("Test");
+    public MockEditingContext mockEditingContext = spy(new MockEditingContext("Test"));
 
     @Dummy
     private FooEntity mockEntity1, mockEntity2;

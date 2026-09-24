@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.matchers;
 
@@ -26,10 +27,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
@@ -145,6 +146,6 @@ public class TestHasBeenSavedMatcher {
 
 	mockDescription = new StringDescription();
 
-	Mockito.when(mockObject.changesFromSnapshot(Matchers.any(NSDictionary.class))).thenReturn(NSDictionary.emptyDictionary());
+	Mockito.when(mockObject.changesFromSnapshot(ArgumentMatchers.nullable(NSDictionary.class))).thenReturn(NSDictionary.emptyDictionary());
     }
 }

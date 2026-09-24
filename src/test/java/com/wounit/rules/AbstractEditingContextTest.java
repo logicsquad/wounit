@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 package com.wounit.rules;
 
@@ -41,7 +42,7 @@ import org.junit.runners.model.Statement;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.webobjects.eoaccess.EOAttribute;
 import com.webobjects.eoaccess.EOEntity;
@@ -254,7 +255,7 @@ public abstract class AbstractEditingContextTest {
     public void ignoreExceptionOnEditingContextDisposal() throws Exception {
 	AbstractEditingContextRule editingContext = Mockito.spy(initEditingContext(TEST_MODEL_NAME));
 
-	Mockito.doThrow(new NullPointerException("sample exception")).when(editingContext).dispose();
+	Mockito.doThrow(new NullPointerException("sample exception")).when(editingContext).disposeImpl();
 
 	editingContext.before();
 

@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 package com.wounit.rules;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -30,8 +31,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.MockUtil;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.wounit.annotations.Dummy;
 import com.wounit.exceptions.WOUnitException;
@@ -129,7 +129,7 @@ public class TestAnnotationProcessor {
 
         assertThat(mockTarget.value(), notNullValue());
 
-        boolean isSpy = new MockUtil().isSpy(mockTarget.value());
+        boolean isSpy = Mockito.mockingDetails(mockTarget.value()).isSpy();
 
         assertTrue(isSpy);
     }
