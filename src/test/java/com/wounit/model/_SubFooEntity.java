@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 
 // $LastChangedRevision: 5773 $ DO NOT EDIT.  Make changes to SubFooEntity.java instead.
 package com.wounit.model;
@@ -22,7 +23,8 @@ import com.webobjects.eocontrol.*;
 import com.webobjects.foundation.*;
 import java.math.*;
 import java.util.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("all")
 public abstract class _SubFooEntity extends com.wounit.model.FooEntity {
@@ -34,7 +36,7 @@ public abstract class _SubFooEntity extends com.wounit.model.FooEntity {
 
 	// Relationships
 
-  private static Logger LOG = Logger.getLogger(_SubFooEntity.class);
+  private static Logger LOG = LoggerFactory.getLogger(_SubFooEntity.class);
 
   public SubFooEntity localInstanceIn(EOEditingContext editingContext) {
     SubFooEntity localInstance = (SubFooEntity)EOUtilities.localInstanceOfObject(editingContext, this);

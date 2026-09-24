@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+// Modifications copyright (C) 2026 Logic Squad.
 // $LastChangedRevision$ DO NOT EDIT.  Make changes to OrdinaryEntity.java instead.
 package com.wounit.model;
 
@@ -21,7 +22,8 @@ import com.webobjects.eocontrol.*;
 import com.webobjects.foundation.*;
 import java.math.*;
 import java.util.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("all")
 public abstract class _OrdinaryEntity extends er.extensions.partials.ERXPartialGenericRecord {
@@ -32,7 +34,7 @@ public abstract class _OrdinaryEntity extends er.extensions.partials.ERXPartialG
 	// Relationships
 	public static final String RELATIONSHIP_TO_PARTIAL_KEY = "relationshipToPartial";
 
-  private static Logger LOG = Logger.getLogger(_OrdinaryEntity.class);
+  private static Logger LOG = LoggerFactory.getLogger(_OrdinaryEntity.class);
 
   public OrdinaryEntity localInstanceIn(EOEditingContext editingContext) {
     OrdinaryEntity localInstance = (OrdinaryEntity)EOUtilities.localInstanceOfObject(editingContext, this);
