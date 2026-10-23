@@ -31,6 +31,14 @@ Changelog
   `WOUnitException` that says how to register it instead. Every test
   after the first used to fail with an error from EOF.
   ([#19](https://github.com/logicsquad/wounit/issues/19))
+* WOUnit sets the `NSProjectBundleEnabled` and `NSBundleFactories`
+  properties as soon as JUnit's launcher opens a session, before any
+  test class loads, as well as when it creates an editing context. A
+  test class that initialises `NSBundle` first, for example by
+  constructing a component, no longer leaves the rest of the run
+  without your project's bundle. If your build sets the two properties
+  as system properties to avoid this, you can remove them.
+  ([#14](https://github.com/logicsquad/wounit/issues/14))
 
 2.0 (2026-09-24)
 ----------------

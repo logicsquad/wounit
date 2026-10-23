@@ -101,6 +101,14 @@ extension. On Java 21 and later, Mockito recommends loading its agent
 explicitly rather than letting it attach itself: see
 [Mockito's instructions](https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3).
 
+WOUnit makes your project a bundle, so that `NSBundle` finds its
+resources, by setting the `NSProjectBundleEnabled` and
+`NSBundleFactories` properties. `NSBundle` reads them only once, and a
+test class can initialise it early, for example by constructing a
+component, so WOUnit sets them as soon as JUnit's launcher starts,
+before any test class loads. If your build sets the two properties as
+system properties for the test JVM, you can remove them.
+
 Getting started
 ---------------
 

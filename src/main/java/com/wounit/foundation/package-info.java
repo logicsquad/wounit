@@ -16,7 +16,8 @@
 
 /**
  * This package contains the bundle factory that WOUnit registers with
- * WebObjects to load framework and application bundles during tests.
+ * WebObjects to load framework and application bundles during tests, and the
+ * JUnit Platform listener that registers it before any test class loads.
  *
  * @since 1.2
  */
