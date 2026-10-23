@@ -17,20 +17,20 @@ the License.
 Changelog
 =========
 
-2.1 (unreleased)
+2.1 (2026-10-23)
 ----------------
 
-* In a `@Nested` test, WOUnit fills the `@UnderTest` and `@Dummy`
-  fields of the enclosing classes too, instead of leaving them `null`.
-  A field gets its object from the editing context that its own class
-  registers, or else from the nearest enclosing class's.
-  ([#18](https://github.com/logicsquad/wounit/issues/18))
 * An editing context that all the tests of a class would share, because
   it's registered in a `static` field or the class has a per-class test
   instance lifecycle, fails the class before its first test, with a
   `WOUnitException` that says how to register it instead. Every test
   after the first used to fail with an error from EOF.
   ([#19](https://github.com/logicsquad/wounit/issues/19))
+* In a `@Nested` test, WOUnit fills the `@UnderTest` and `@Dummy`
+  fields of the enclosing classes too, instead of leaving them `null`.
+  A field gets its object from the editing context that its own class
+  registers, or else from the nearest enclosing class's.
+  ([#18](https://github.com/logicsquad/wounit/issues/18))
 * WOUnit sets the `NSProjectBundleEnabled` and `NSBundleFactories`
   properties as soon as JUnit's launcher opens a session, before any
   test class loads, as well as when it creates an editing context. A
