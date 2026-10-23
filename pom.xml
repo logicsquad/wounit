@@ -188,7 +188,9 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- Doclint can't see a package without a package-info.java -->
+				<!-- Doclint can't see a package without a package-info.java. JavadocPackage
+					only checks that the file exists, so the Checkstyle that the plugin
+					bundles is enough -->
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>3.6.0</version>
 				<configuration>
@@ -198,13 +200,6 @@
 						</module>
 					</checkstyleRules>
 				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>com.puppycrawl.tools</groupId>
-						<artifactId>checkstyle</artifactId>
-						<version>14.1.0</version>
-					</dependency>
-				</dependencies>
 				<executions>
 					<execution>
 						<goals>
