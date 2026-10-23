@@ -39,6 +39,15 @@ Changelog
   without your project's bundle. If your build sets the two properties
   as system properties to avoid this, you can remove them.
   ([#14](https://github.com/logicsquad/wounit/issues/14))
+* An EOModel that WOUnit loads again for a later test gives its
+  enterprise objects the entities of that load. Wonder registers class
+  descriptions only once per model name, so the objects used to
+  describe the entities of the model's first load: a change a test made
+  to the model through `EOModelGroup` didn't reach them, changes to the
+  first load carried over into later tests, and test classes that
+  switched partial entities on and off failed in one JVM. WOUnit now
+  makes Wonder forget the earlier load first.
+  ([#10](https://github.com/logicsquad/wounit/issues/10))
 
 2.0 (2026-09-24)
 ----------------

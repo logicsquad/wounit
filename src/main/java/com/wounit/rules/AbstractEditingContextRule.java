@@ -332,6 +332,10 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
 
     /**
      * Load the model with the specified name into the default model group.
+     * <p>
+     * If the model has been loaded before, Wonder first forgets the class
+     * descriptions of the earlier load, so that the model's enterprise objects
+     * describe the entities that this load creates.
      *
      * @param modelName
      *            name of the model to be loaded
@@ -357,6 +361,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
         if (url == null) {
             throw new IllegalArgumentException(WOUnitTroubleshooter.diagnoseModelNotFound(modelName));
         }
+
+        ModelClassDescriptions.forget(modelName);
 
         modelGroup.addModelWithPathURL(url);
 

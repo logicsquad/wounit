@@ -23,23 +23,23 @@ import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
 
 /**
- * Runs a stub test case through the JUnit Platform launcher, in a launcher
- * session of its own. The stub test cases that have tests are disabled, so
- * that nothing else runs them, and this launcher deactivates the condition
- * that skips them.
+ * Runs a test class, usually a stub test case, through the JUnit Platform
+ * launcher, in a launcher session of its own. The stub test cases that have
+ * tests are disabled, so that nothing else runs them, and this launcher
+ * deactivates the condition that skips them.
  */
 public class StubTestCaseLauncher {
     /**
-     * Run the tests of a stub test case.
+     * Run the tests of a test class.
      *
-     * @param stubTestCase
-     *            the stub test case to run
+     * @param testClass
+     *            the test class to run
      * @return the summary of the run
      */
-    public static TestExecutionSummary launch(Class<?> stubTestCase) {
+    public static TestExecutionSummary launch(Class<?> testClass) {
 	SummaryGeneratingListener listener = new SummaryGeneratingListener();
 
-	LauncherFactory.create().execute(request().selectors(selectClass(stubTestCase)).configurationParameter("junit.jupiter.conditions.deactivate", "org.junit.*DisabledCondition").build(), listener);
+	LauncherFactory.create().execute(request().selectors(selectClass(testClass)).configurationParameter("junit.jupiter.conditions.deactivate", "org.junit.*DisabledCondition").build(), listener);
 
 	return listener.getSummary();
     }

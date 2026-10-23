@@ -155,7 +155,8 @@ Here's what happens:
 * Before each test, WOUnit fills the `@UnderTest` field with a new
   `Book`, inserted into the editing context.
 * After each test, WOUnit disposes of the editing context and unloads
-  the models it loaded.
+  the models it loaded, so the next test loads them afresh, and a
+  change one test makes to a model doesn't reach the next.
 * `confirm()` and the matchers come from `EOAssert`, described below.
 
 ### Unit tests with MockEditingContext
