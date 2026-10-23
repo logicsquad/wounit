@@ -25,6 +25,12 @@ Changelog
   A field gets its object from the editing context that its own class
   registers, or else from the nearest enclosing class's.
   ([#18](https://github.com/logicsquad/wounit/issues/18))
+* An editing context that all the tests of a class would share, because
+  it's registered in a `static` field or the class has a per-class test
+  instance lifecycle, fails the class before its first test, with a
+  `WOUnitException` that says how to register it instead. Every test
+  after the first used to fail with an error from EOF.
+  ([#19](https://github.com/logicsquad/wounit/issues/19))
 
 2.0 (2026-09-24)
 ----------------

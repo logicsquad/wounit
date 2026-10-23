@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -39,6 +41,7 @@ import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.eocontrol.EOObjectStore;
 import com.wounit.annotations.UnderTest;
+import com.wounit.exceptions.WOUnitException;
 import com.wounit.foundation.WOUnitBundleFactory;
 import com.wounit.utils.WOUnitEditingContextFactory;
 
@@ -55,11 +58,18 @@ import er.extensions.partials.ERXPartialInitializer;
  * {@link AfterEachCallback} interfaces. This class provides the required
  * infrastructure to properly initialize/dispose the <code>ERXEC</code>
  * before/after the test execution.
+ * <p>
+ * Each test needs an editing context of its own, so the editing context must
+ * be registered in an instance field of a test class with the default
+ * per-method test instance lifecycle. JUnit calls the
+ * {@link BeforeAllCallback} and {@link AfterAllCallback} methods only on an
+ * editing context that all the tests of a class would share, which fails the
+ * class before its first test.
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
-public abstract class AbstractEditingContextRule extends ERXEC implements BeforeEachCallback, AfterEachCallback {
+public abstract class AbstractEditingContextRule extends ERXEC implements BeforeAllCallback, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
     // Lazy initialization of singleton instance of ERXExtensions
     private static class SINGLETONS {
         static ERXExtensions exrExtensions = new ERXExtensions();
@@ -191,6 +201,21 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
     }
 
     /**
+     * Fail the test class before its first test, because all its tests would
+     * share this editing context. JUnit calls this method only when the
+     * editing context is registered in a <code>static</code> field, or the
+     * test class has a per-class test instance lifecycle.
+     *
+     * @throws WOUnitException
+     *             always, saying how to register the editing context instead
+     * @since 2.1
+     */
+    @Override
+    public void beforeAll(ExtensionContext context) {
+        throw new WOUnitException(String.format("Each test needs an editing context of its own, but this %s would be shared by all the tests in %s. Register it in an instance field rather than a static one, and keep the default per-method test instance lifecycle.", getClass().getSimpleName(), context.getRequiredTestClass().getName()));
+    }
+
+    /**
      * Create the annotation processor for the test instances and set up this
      * editing context before each JUnit Jupiter test.
      * <p>
@@ -274,6 +299,20 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
      */
     @Override
     public void afterEach(ExtensionContext context) {
+        after();
+    }
+
+    /**
+     * Release what the constructor set up, such as the models it loaded, after
+     * {@link #beforeAll(ExtensionContext)} has failed the test class.
+     *
+     * @since 2.1
+     */
+    @Override
+    public void afterAll(ExtensionContext context) {
+        // after() releases the lock that before() takes
+        lock();
+
         after();
     }
 

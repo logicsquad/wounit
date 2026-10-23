@@ -71,6 +71,11 @@ import er.extensions.eof.ERXS;
  *     }
  * }
  * </pre>
+ * <p>
+ * Register it in an instance field, as shown. All the tests of a class would
+ * share an editing context registered in a <code>static</code> field, or in a
+ * class with a per-class test instance lifecycle, so WOUnit fails such a class
+ * before its first test.
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0

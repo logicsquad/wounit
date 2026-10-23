@@ -136,7 +136,10 @@ Here's what happens:
 
 * `@RegisterExtension` registers the editing context with JUnit. JUnit
   creates a new test instance for each test by default, so each test
-  gets a fresh editing context.
+  gets a fresh editing context. Keep it that way: in a `static` field,
+  or in a class with `@TestInstance(Lifecycle.PER_CLASS)`, one editing
+  context would serve every test in the class, so WOUnit fails the
+  class before its first test.
 * The constructor loads the `Library` EOModel from the classpath, as
   `Resources/Library.eomodeld` or `Library.eomodeld`. Pass as many model
   names as the test needs. If WOUnit can't find a model, its exception
