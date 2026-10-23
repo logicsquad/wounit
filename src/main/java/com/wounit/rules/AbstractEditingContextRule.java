@@ -17,13 +17,19 @@
 
 package com.wounit.rules;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +41,7 @@ import com.webobjects.eocontrol.EOEditingContext;
 import com.webobjects.eocontrol.EOEnterpriseObject;
 import com.webobjects.eocontrol.EOObjectStore;
 import com.wounit.annotations.UnderTest;
+import com.wounit.exceptions.WOUnitException;
 import com.wounit.foundation.WOUnitBundleFactory;
 import com.wounit.utils.WOUnitEditingContextFactory;
 
@@ -51,11 +58,18 @@ import er.extensions.partials.ERXPartialInitializer;
  * {@link AfterEachCallback} interfaces. This class provides the required
  * infrastructure to properly initialize/dispose the <code>ERXEC</code>
  * before/after the test execution.
+ * <p>
+ * Each test needs an editing context of its own, so the editing context must
+ * be registered in an instance field of a test class with the default
+ * per-method test instance lifecycle. JUnit calls the
+ * {@link BeforeAllCallback} and {@link AfterAllCallback} methods only on an
+ * editing context that all the tests of a class would share, which fails the
+ * class before its first test.
  * 
  * @author <a href="mailto:hprange@gmail.com">Henrique Prange</a>
  * @since 1.0
  */
-public abstract class AbstractEditingContextRule extends ERXEC implements BeforeEachCallback, AfterEachCallback {
+public abstract class AbstractEditingContextRule extends ERXEC implements BeforeAllCallback, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
     // Lazy initialization of singleton instance of ERXExtensions
     private static class SINGLETONS {
         static ERXExtensions exrExtensions = new ERXExtensions();
@@ -187,16 +201,95 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
     }
 
     /**
-     * Create the annotation processor for the test instance and set up this
+     * Fail the test class before its first test, because all its tests would
+     * share this editing context. JUnit calls this method only when the
+     * editing context is registered in a <code>static</code> field, or the
+     * test class has a per-class test instance lifecycle.
+     *
+     * @throws WOUnitException
+     *             always, saying how to register the editing context instead
+     * @since 2.1
+     */
+    @Override
+    public void beforeAll(ExtensionContext context) {
+        throw new WOUnitException(String.format("Each test needs an editing context of its own, but this %s would be shared by all the tests in %s. Register it in an instance field rather than a static one, and keep the default per-method test instance lifecycle.", getClass().getSimpleName(), context.getRequiredTestClass().getName()));
+    }
+
+    /**
+     * Create the annotation processor for the test instances and set up this
      * editing context before each JUnit Jupiter test.
+     * <p>
+     * In a <code>&#064;Nested</code> test, this editing context fills the
+     * fields of the instance that registers it and of the instances nested in
+     * that one, up to one that registers an editing context of its own.
      *
      * @see #before()
      */
     @Override
     public void beforeEach(ExtensionContext context) {
-        processor = new AnnotationProcessor(context.getRequiredTestInstance());
+        processor = new AnnotationProcessor(instancesToFill(context.getRequiredTestInstances().getAllInstances()));
 
         before();
+    }
+
+    /**
+     * Select the test instances whose fields this editing context fills: the
+     * one that registers it, and those nested in that one, up to one that
+     * registers an editing context of its own. If no instance registers this
+     * editing context, it fills them all.
+     *
+     * @param instances
+     *            the instances of a test, outermost first
+     * @return the instances to fill, outermost first
+     */
+    private List<Object> instancesToFill(List<Object> instances) {
+        for (int first = 0; first < instances.size(); first++) {
+            if (editingContextsRegisteredBy(instances.get(first)).stream().noneMatch(editingContext -> editingContext == this)) {
+                continue;
+            }
+
+            int end = first + 1;
+
+            while (end < instances.size() && editingContextsRegisteredBy(instances.get(end)).isEmpty()) {
+                end++;
+            }
+
+            return instances.subList(first, end);
+        }
+
+        return instances;
+    }
+
+    /**
+     * Find the editing contexts that a test instance registers in its
+     * <code>&#064;RegisterExtension</code> instance fields, inherited ones
+     * included. Fields that can't be made accessible are left out.
+     *
+     * @param instance
+     *            a test instance
+     * @return the editing contexts it registers
+     */
+    private static List<AbstractEditingContextRule> editingContextsRegisteredBy(Object instance) {
+        List<AbstractEditingContextRule> editingContexts = new ArrayList<AbstractEditingContextRule>();
+
+        for (Class<?> type = instance.getClass(); type != null; type = type.getSuperclass()) {
+            for (Field field : type.getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers()) || !field.isAnnotationPresent(RegisterExtension.class) || !field.trySetAccessible()) {
+                    continue;
+                }
+
+                try {
+                    if (field.get(instance) instanceof AbstractEditingContextRule editingContext) {
+                        editingContexts.add(editingContext);
+                    }
+                } catch (IllegalAccessException exception) {
+                    // Can't happen once the field is accessible
+                    throw new IllegalStateException(exception);
+                }
+            }
+        }
+
+        return editingContexts;
     }
 
     /**
@@ -206,6 +299,20 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
      */
     @Override
     public void afterEach(ExtensionContext context) {
+        after();
+    }
+
+    /**
+     * Release what the constructor set up, such as the models it loaded, after
+     * {@link #beforeAll(ExtensionContext)} has failed the test class.
+     *
+     * @since 2.1
+     */
+    @Override
+    public void afterAll(ExtensionContext context) {
+        // after() releases the lock that before() takes
+        lock();
+
         after();
     }
 
@@ -225,6 +332,10 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
 
     /**
      * Load the model with the specified name into the default model group.
+     * <p>
+     * If the model has been loaded before, Wonder first forgets the class
+     * descriptions of the earlier load, so that the model's enterprise objects
+     * describe the entities that this load creates.
      *
      * @param modelName
      *            name of the model to be loaded
@@ -250,6 +361,8 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
         if (url == null) {
             throw new IllegalArgumentException(WOUnitTroubleshooter.diagnoseModelNotFound(modelName));
         }
+
+        ModelClassDescriptions.forget(modelName);
 
         modelGroup.addModelWithPathURL(url);
 

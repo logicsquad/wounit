@@ -17,6 +17,38 @@ the License.
 Changelog
 =========
 
+2.1 (2026-10-23)
+----------------
+
+* An editing context that all the tests of a class would share, because
+  it's registered in a `static` field or the class has a per-class test
+  instance lifecycle, fails the class before its first test, with a
+  `WOUnitException` that says how to register it instead. Every test
+  after the first used to fail with an error from EOF.
+  ([#19](https://github.com/logicsquad/wounit/issues/19))
+* In a `@Nested` test, WOUnit fills the `@UnderTest` and `@Dummy`
+  fields of the enclosing classes too, instead of leaving them `null`.
+  A field gets its object from the editing context that its own class
+  registers, or else from the nearest enclosing class's.
+  ([#18](https://github.com/logicsquad/wounit/issues/18))
+* WOUnit sets the `NSProjectBundleEnabled` and `NSBundleFactories`
+  properties as soon as JUnit's launcher opens a session, before any
+  test class loads, as well as when it creates an editing context. A
+  test class that initialises `NSBundle` first, for example by
+  constructing a component, no longer leaves the rest of the run
+  without your project's bundle. If your build sets the two properties
+  as system properties to avoid this, you can remove them.
+  ([#14](https://github.com/logicsquad/wounit/issues/14))
+* An EOModel that WOUnit loads again for a later test gives its
+  enterprise objects the entities of that load. Wonder registers class
+  descriptions only once per model name, so the objects used to
+  describe the entities of the model's first load: a change a test made
+  to the model through `EOModelGroup` didn't reach them, changes to the
+  first load carried over into later tests, and test classes that
+  switched partial entities on and off failed in one JVM. WOUnit now
+  makes Wonder forget the earlier load first.
+  ([#10](https://github.com/logicsquad/wounit/issues/10))
+
 2.0 (2026-09-24)
 ----------------
 

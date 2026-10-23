@@ -55,7 +55,7 @@ WOUnit is published to Maven Central. Add it to your test dependencies:
 <dependency>
     <groupId>net.logicsquad</groupId>
     <artifactId>wounit</artifactId>
-    <version>2.0</version>
+    <version>2.1</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -101,6 +101,14 @@ extension. On Java 21 and later, Mockito recommends loading its agent
 explicitly rather than letting it attach itself: see
 [Mockito's instructions](https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3).
 
+WOUnit makes your project a bundle, so that `NSBundle` finds its
+resources, by setting the `NSProjectBundleEnabled` and
+`NSBundleFactories` properties. `NSBundle` reads them only once, and a
+test class can initialise it early, for example by constructing a
+component, so WOUnit sets them as soon as JUnit's launcher starts,
+before any test class loads. If your build sets the two properties as
+system properties for the test JVM, you can remove them.
+
 Getting started
 ---------------
 
@@ -136,7 +144,10 @@ Here's what happens:
 
 * `@RegisterExtension` registers the editing context with JUnit. JUnit
   creates a new test instance for each test by default, so each test
-  gets a fresh editing context.
+  gets a fresh editing context. Keep it that way: in a `static` field,
+  or in a class with `@TestInstance(Lifecycle.PER_CLASS)`, one editing
+  context would serve every test in the class, so WOUnit fails the
+  class before its first test.
 * The constructor loads the `Library` EOModel from the classpath, as
   `Resources/Library.eomodeld` or `Library.eomodeld`. Pass as many model
   names as the test needs. If WOUnit can't find a model, its exception
@@ -144,7 +155,8 @@ Here's what happens:
 * Before each test, WOUnit fills the `@UnderTest` field with a new
   `Book`, inserted into the editing context.
 * After each test, WOUnit disposes of the editing context and unloads
-  the models it loaded.
+  the models it loaded, so the next test loads them afresh, and a
+  change one test makes to a model doesn't reach the next.
 * `confirm()` and the matchers come from `EOAssert`, described below.
 
 ### Unit tests with MockEditingContext
@@ -303,6 +315,11 @@ class BookTest {
 To fill an `NSArray` field with several objects, give either annotation
 a `size`, as in `@Dummy(size = 3) NSArray<Author> authors`.
 
+`@Nested` test classes work too: before each nested test, WOUnit fills
+the fields of the nested class and of the classes around it. A field
+gets its object from the editing context that its own class registers,
+or, if that class registers none, from the nearest enclosing class's.
+
 ### Assertions with EOAssert
 
 `EOAssert` provides Hamcrest matchers for enterprise objects and
@@ -403,7 +420,7 @@ the work is moving your tests to JUnit Jupiter:
    [migration guide](https://docs.junit.org/current/migrating-from-junit4.html)
    covers `@Before` → `@BeforeEach` and the rest.
 2. **Change the dependency** from `com.wounit:wounit:1.5` to
-   `net.logicsquad:wounit:2.0`, as shown above. The packages haven't
+   `net.logicsquad:wounit:2.1`, as shown above. The packages haven't
    changed, so your imports stay as they are.
 3. **Register editing contexts with `@RegisterExtension`** instead of
    `@Rule`:
