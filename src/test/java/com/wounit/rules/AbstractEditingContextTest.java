@@ -33,11 +33,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URL;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestInstances;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -66,6 +68,9 @@ public abstract class AbstractEditingContextTest {
 
     @Mock
     protected ExtensionContext mockExtensionContext;
+
+    @Mock
+    private TestInstances mockTestInstances;
 
     @Test
     public void alwaysConfigureWOUnitBundleFactory() throws Exception {
@@ -197,7 +202,7 @@ public abstract class AbstractEditingContextTest {
     public void ensureEditingContextCleanUpIsTriggeredAfterEachTest() throws Exception {
 	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
 
-	when(mockExtensionContext.getRequiredTestInstance()).thenReturn(new StubTestCase());
+	givenTestInstances(new StubTestCase());
 
 	editingContext.beforeEach(mockExtensionContext);
 	editingContext.afterEach(mockExtensionContext);
@@ -209,7 +214,7 @@ public abstract class AbstractEditingContextTest {
     public void ensureEditingContextInitializationIsTriggeredBeforeEachTest() throws Exception {
 	AbstractEditingContextRule editingContext = spy(initEditingContext(TEST_MODEL_NAME));
 
-	when(mockExtensionContext.getRequiredTestInstance()).thenReturn(new StubTestCase());
+	givenTestInstances(new StubTestCase());
 
 	editingContext.beforeEach(mockExtensionContext);
 
@@ -224,7 +229,7 @@ public abstract class AbstractEditingContextTest {
 
 	StubTestCase testCase = new StubTestCase();
 
-	when(mockExtensionContext.getRequiredTestInstance()).thenReturn(testCase);
+	givenTestInstances(testCase);
 
 	editingContext.beforeEach(mockExtensionContext);
 
@@ -238,6 +243,11 @@ public abstract class AbstractEditingContextTest {
 	IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> initEditingContext("UnknownModel"));
 
 	assertThat(exception.getMessage(), startsWith("Cannot load model named 'UnknownModel'."));
+    }
+
+    private void givenTestInstances(Object... instances) {
+	when(mockExtensionContext.getRequiredTestInstances()).thenReturn(mockTestInstances);
+	when(mockTestInstances.getAllInstances()).thenReturn(List.of(instances));
     }
 
     @Test

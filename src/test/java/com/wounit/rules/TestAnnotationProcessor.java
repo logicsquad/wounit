@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -115,6 +117,19 @@ public class TestAnnotationProcessor {
         processor.process(Dummy.class, mockFacade);
 
         assertThat(mockTarget.foo(), is(mockFoo));
+    }
+
+    @Test
+    public void createObjectsForEveryTarget() throws Exception {
+        StubTestCase enclosingTarget = new StubTestCase();
+        StubTestCase nestedTarget = new StubTestCase();
+
+        AnnotationProcessor processor = new AnnotationProcessor(List.of(enclosingTarget, nestedTarget));
+
+        processor.process(Dummy.class, mockFacade);
+
+        assertThat(enclosingTarget.foo(), is(mockFoo));
+        assertThat(nestedTarget.foo(), is(mockFoo));
     }
 
     @Test

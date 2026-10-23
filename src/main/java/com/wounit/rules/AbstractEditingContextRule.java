@@ -17,13 +17,17 @@
 
 package com.wounit.rules;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,16 +191,80 @@ public abstract class AbstractEditingContextRule extends ERXEC implements Before
     }
 
     /**
-     * Create the annotation processor for the test instance and set up this
+     * Create the annotation processor for the test instances and set up this
      * editing context before each JUnit Jupiter test.
+     * <p>
+     * In a <code>&#064;Nested</code> test, this editing context fills the
+     * fields of the instance that registers it and of the instances nested in
+     * that one, up to one that registers an editing context of its own.
      *
      * @see #before()
      */
     @Override
     public void beforeEach(ExtensionContext context) {
-        processor = new AnnotationProcessor(context.getRequiredTestInstance());
+        processor = new AnnotationProcessor(instancesToFill(context.getRequiredTestInstances().getAllInstances()));
 
         before();
+    }
+
+    /**
+     * Select the test instances whose fields this editing context fills: the
+     * one that registers it, and those nested in that one, up to one that
+     * registers an editing context of its own. If no instance registers this
+     * editing context, it fills them all.
+     *
+     * @param instances
+     *            the instances of a test, outermost first
+     * @return the instances to fill, outermost first
+     */
+    private List<Object> instancesToFill(List<Object> instances) {
+        for (int first = 0; first < instances.size(); first++) {
+            if (editingContextsRegisteredBy(instances.get(first)).stream().noneMatch(editingContext -> editingContext == this)) {
+                continue;
+            }
+
+            int end = first + 1;
+
+            while (end < instances.size() && editingContextsRegisteredBy(instances.get(end)).isEmpty()) {
+                end++;
+            }
+
+            return instances.subList(first, end);
+        }
+
+        return instances;
+    }
+
+    /**
+     * Find the editing contexts that a test instance registers in its
+     * <code>&#064;RegisterExtension</code> instance fields, inherited ones
+     * included. Fields that can't be made accessible are left out.
+     *
+     * @param instance
+     *            a test instance
+     * @return the editing contexts it registers
+     */
+    private static List<AbstractEditingContextRule> editingContextsRegisteredBy(Object instance) {
+        List<AbstractEditingContextRule> editingContexts = new ArrayList<AbstractEditingContextRule>();
+
+        for (Class<?> type = instance.getClass(); type != null; type = type.getSuperclass()) {
+            for (Field field : type.getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers()) || !field.isAnnotationPresent(RegisterExtension.class) || !field.trySetAccessible()) {
+                    continue;
+                }
+
+                try {
+                    if (field.get(instance) instanceof AbstractEditingContextRule editingContext) {
+                        editingContexts.add(editingContext);
+                    }
+                } catch (IllegalAccessException exception) {
+                    // Can't happen once the field is accessible
+                    throw new IllegalStateException(exception);
+                }
+            }
+        }
+
+        return editingContexts;
     }
 
     /**

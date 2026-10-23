@@ -88,19 +88,14 @@ class AnnotationProcessor {
     }
 
     /**
-     * All the fields declared for the target object's class.
-     */
-    private final List<Field> fields;
-
-    /**
      * Determines if Mockito is available in the classpath.
      */
     private final boolean isMockitoPresent;
 
     /**
-     * The target object to be examined.
+     * The target objects to be examined.
      */
-    private final Object target;
+    private final List<Object> targets;
 
     /**
      * Create an annotation processor for the given target object.
@@ -109,12 +104,22 @@ class AnnotationProcessor {
      *            an object, usually a test case.
      */
     AnnotationProcessor(Object target) {
-        this.target = target;
-        fields = getAllFields(target.getClass());
+        this(List.of(target));
+    }
+
+    /**
+     * Create an annotation processor for the given target objects.
+     *
+     * @param targets
+     *            objects, usually a test case and the instances that enclose
+     *            it, outermost first.
+     */
+    AnnotationProcessor(List<?> targets) {
+        this.targets = new ArrayList<Object>(targets);
         isMockitoPresent = isMockitoPresent();
     }
 
-    private Object initializeObject(Field field, Class<? extends Annotation> annotation, EditingContextFacade facade) {
+    private Object initializeObject(Object target, Field field, Class<? extends Annotation> annotation, EditingContextFacade facade) {
         Class<?> type = field.getType();
 
         int size = getAnnotationSize(field.getAnnotation(annotation));
@@ -198,7 +203,7 @@ class AnnotationProcessor {
     }
 
     /**
-     * Examine the fields of this target object and create enterprise objects
+     * Examine the fields of the target objects and create enterprise objects
      * for the fields which the given annotation is present.
      * <p>
      * Fields annotated with <code>@Spy</code> have their objects inserted in
@@ -212,19 +217,21 @@ class AnnotationProcessor {
      * @see org.mockito.Spy
      */
     void process(Class<? extends Annotation> annotation, EditingContextFacade facade) {
-        for (Field field : fields) {
-            if (!field.isAnnotationPresent(annotation)) {
-                continue;
-            }
+        for (Object target : targets) {
+            for (Field field : getAllFields(target.getClass())) {
+                if (!field.isAnnotationPresent(annotation)) {
+                    continue;
+                }
 
-            Object object = initializeObject(field, annotation, facade);
+                Object object = initializeObject(target, field, annotation, facade);
 
-            field.setAccessible(true);
+                field.setAccessible(true);
 
-            try {
-                field.set(target, object);
-            } catch (Exception exception) {
-                throw unexpectedException(exception);
+                try {
+                    field.set(target, object);
+                } catch (Exception exception) {
+                    throw unexpectedException(exception);
+                }
             }
         }
     }

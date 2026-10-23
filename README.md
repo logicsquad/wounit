@@ -303,6 +303,11 @@ class BookTest {
 To fill an `NSArray` field with several objects, give either annotation
 a `size`, as in `@Dummy(size = 3) NSArray<Author> authors`.
 
+`@Nested` test classes work too: before each nested test, WOUnit fills
+the fields of the nested class and of the classes around it. A field
+gets its object from the editing context that its own class registers,
+or, if that class registers none, from the nearest enclosing class's.
+
 ### Assertions with EOAssert
 
 `EOAssert` provides Hamcrest matchers for enterprise objects and

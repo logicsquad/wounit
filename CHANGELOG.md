@@ -17,6 +17,15 @@ the License.
 Changelog
 =========
 
+2.1 (unreleased)
+----------------
+
+* In a `@Nested` test, WOUnit fills the `@UnderTest` and `@Dummy`
+  fields of the enclosing classes too, instead of leaving them `null`.
+  A field gets its object from the editing context that its own class
+  registers, or else from the nearest enclosing class's.
+  ([#18](https://github.com/logicsquad/wounit/issues/18))
+
 2.0 (2026-09-24)
 ----------------
 
