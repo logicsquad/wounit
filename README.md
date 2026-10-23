@@ -55,7 +55,7 @@ WOUnit is published to Maven Central. Add it to your test dependencies:
 <dependency>
     <groupId>net.logicsquad</groupId>
     <artifactId>wounit</artifactId>
-    <version>2.0</version>
+    <version>2.1</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -420,7 +420,7 @@ the work is moving your tests to JUnit Jupiter:
    [migration guide](https://docs.junit.org/current/migrating-from-junit4.html)
    covers `@Before` → `@BeforeEach` and the rest.
 2. **Change the dependency** from `com.wounit:wounit:1.5` to
-   `net.logicsquad:wounit:2.0`, as shown above. The packages haven't
+   `net.logicsquad:wounit:2.1`, as shown above. The packages haven't
    changed, so your imports stay as they are.
 3. **Register editing contexts with `@RegisterExtension`** instead of
    `@Rule`:
