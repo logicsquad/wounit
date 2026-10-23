@@ -66,6 +66,7 @@
 		<slf4j.version>1.7.36</slf4j.version>
 		<maven.compiler.release>21</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- The Javadoc jar takes its encoding from this, despite the name -->
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- A rehearsal of the deploy workflow sets this to false -->
 		<central.autoPublish>true</central.autoPublish>
@@ -135,19 +136,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.12.0</version>
-					<configuration>
-						<!-- The default footer credits the organization with the whole project;
-							this one follows the source headers -->
-						<bottom><![CDATA[Copyright &#169; 2009 Henrique Prange. Modifications copyright &#169; 2026 Logic Squad. Licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.]]></bottom>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -182,9 +170,13 @@
 					published is the one checked. Any doclint warning, a missing comment
 					included, fails the build -->
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.12.0</version>
 				<configuration>
 					<doclint>all</doclint>
 					<failOnWarnings>true</failOnWarnings>
+					<!-- The default footer credits the organization with the whole project;
+						this one follows the source headers -->
+					<bottom><![CDATA[Copyright &#169; 2009 Henrique Prange. Modifications copyright &#169; 2026 Logic Squad. Licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>.]]></bottom>
 				</configuration>
 				<executions>
 					<execution>
@@ -220,10 +212,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>3.22.0</version>
 			</plugin>
 		</plugins>
 	</build>
@@ -350,40 +338,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<reporting>
-		<plugins>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.12.0</version>
-				<configuration>
-					<detectLinks>true</detectLinks>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<version>3.6.0</version>
-				<configuration>
-					<linkJavadoc>true</linkJavadoc>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.28.0</version>
-				<configuration>
-					<linkXref>true</linkXref>
-					<targetJdk>${maven.compiler.release}</targetJdk>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.6.0</version>
-			</plugin>
-			<plugin>
-				<groupId>com.github.spotbugs</groupId>
-				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.10.4.1</version>
-			</plugin>
-		</plugins>
-	</reporting>
 </project>
