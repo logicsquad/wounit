@@ -155,7 +155,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.6.0</version>
+				<version>3.6.1</version>
 				<configuration>
 					<!-- Mockito's inline mock maker needs its agent; attaching it at runtime
 						is deprecated since Java 21 -->
